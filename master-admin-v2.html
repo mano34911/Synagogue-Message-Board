@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<title>Master Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#143f7d,#06152d 50%,#020710);color:#fff;padding:24px}.card{width:min(1200px,98vw);margin:auto;background:linear-gradient(180deg,#0b2b5d,#061a3b);border:3px solid #d7a62d;border-radius:24px;box-shadow:0 20px 60px #0008;padding:28px}h1{color:#f6d469;text-align:center}.muted{text-align:center;color:#d8dfef}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}button,.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer;text-decoration:none;background:#d7a62d;color:#07152d}.secondary{background:#fff}.danger{background:#b51f26;color:#fff}.success{background:#2f9d57;color:#fff}.msg{text-align:center;font-weight:800;min-height:24px;margin:12px 0;white-space:pre-wrap}table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radius:12px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2df9c}.pill{padding:4px 8px;border-radius:999px;background:#e7e7e7;font-weight:800;font-size:12px}.price{width:100px;padding:7px}.mini{padding:7px 9px;font-size:12px}@media(max-width:650px){table{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>👑 Master Admin</h1>
+<p class="muted">Synagogue Message Board</p>
+<div class="actions"><button onclick="loadMembers()">Refresh</button><button class="secondary" onclick="logoutMaster()">Logout</button></div>
+<div id="msg" class="msg">Checking master admin session…</div>
+<div style="overflow:auto"><table><thead><tr><th>Synagogue</th><th>Owner</th><th>Status</th><th>Trial</th><th>Price / month</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://chcfhxkggbrlxaopnfum.supabase.co";
+const SUPABASE_KEY="sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+const MASTER_EMAIL="mano3491@gmail.com";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"synagogue-master-admin-auth-v3"}});
+const msg=document.getElementById('msg'), rows=document.getElementById('rows');
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function daysLeft(d){if(!d)return null;return Math.max(0,Math.ceil((new Date(d)-Date.now())/86400000));}
+async function requireMaster(){
+  const {data:{session},error:sErr}=await sb.auth.getSession();
+  if(sErr) throw new Error('Session error: '+sErr.message);
+  if(!session){ window.location.replace('master-login-v2.html'); return null; }
+  if(String(session.user.email||'').toLowerCase()!==MASTER_EMAIL){
+    await sb.auth.signOut({scope:'local'});
+    window.location.replace('master-login-v2.html');
+    return null;
+  }
+  return session.user;
+}
+async function loadMembers(){
+  try{
+    const user=await requireMaster(); if(!user)return;
+    msg.textContent='Logged in as '+(user.email||'master admin')+' — loading accounts…';
+    const {data,error}=await sb.from('synagogues').select('*').order('created_at',{ascending:false});
+    if(error){msg.textContent='Logged in successfully. Synagogue list error: '+error.message; return;}
+    const list=data||[];
+    rows.innerHTML=list.map(s=>{const left=s.status==='trial'?daysLeft(s.trial_ends_at):null;return `<tr><td><strong>${esc(s.synagogue_name||s.name||'')}</strong><br><small>${esc(s.rabbi_name||'')}</small></td><td>${esc(s.owner_email||s.email||s.owner_user_id||'')}</td><td><span class="pill">${esc(s.status||'')}</span></td><td>${left===null?'—':left+' days'}</td><td><input class="price" id="price_${s.id}" type="number" min="0" step="0.01" value="${(Number(s.price_monthly_cents)||0)/100}"></td><td><button class="mini success" onclick="approve('${s.id}')">Approve + 7 days</button> <button class="mini" onclick="activate('${s.id}')">Activate</button> <button class="mini danger" onclick="suspendMember('${s.id}')">Suspend</button> <button class="mini" onclick="setPrice('${s.id}')">Save price</button></td></tr>`}).join('');
+    msg.textContent='Master admin login successful — '+list.length+' synagogue account(s).';
+  }catch(e){console.error(e);msg.textContent=e.message||String(e);}
+}
+async function approve(id){const now=new Date(),end=new Date(Date.now()+7*86400000);const {error}=await sb.from('synagogues').update({status:'trial',trial_starts_at:now.toISOString(),trial_ends_at:end.toISOString(),approved_at:now.toISOString()}).eq('id',id);if(error)msg.textContent=error.message;else loadMembers();}
+async function activate(id){const {error}=await sb.from('synagogues').update({status:'active'}).eq('id',id);if(error)msg.textContent=error.message;else loadMembers();}
+async function suspendMember(id){const {error}=await sb.from('synagogues').update({status:'suspended'}).eq('id',id);if(error)msg.textContent=error.message;else loadMembers();}
+async function setPrice(id){const v=Number(document.getElementById('price_'+id).value)||0;const {error}=await sb.from('synagogues').update({price_monthly_cents:Math.round(v*100)}).eq('id',id);if(error)msg.textContent=error.message;else loadMembers();}
+async function logoutMaster(){await sb.auth.signOut({scope:'local'});window.location.replace('master-login-v2.html');}
+loadMembers();
+</script>
+</body></html>
