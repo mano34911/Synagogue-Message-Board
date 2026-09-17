@@ -1,96 +1,707 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Master Admin</title>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Master Admin</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,"Noto Sans Hebrew",sans-serif;background:radial-gradient(circle at top,#143f7d,#06152d 50%,#020710);color:#fff;display:grid;place-items:center;padding:24px}
-.card{width:min(760px,96vw);background:linear-gradient(180deg,#0b2b5d,#061a3b);border:3px solid #d7a62d;border-radius:24px;box-shadow:0 20px 60px #0008,inset 0 0 0 2px #fff2a633;padding:28px}
-h1{color:#f6d469;text-align:center;margin:0 0 8px}p{line-height:1.55}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.wide{grid-column:1/-1}
-label{display:flex;flex-direction:column;gap:6px;font-weight:800}input,select{width:100%;padding:13px;border-radius:10px;border:1px solid #d7a62d;background:#fff;color:#111;font-size:16px}
-button,.btn{display:inline-block;border:0;border-radius:11px;padding:12px 18px;background:#d7a62d;color:#07152d;font-weight:900;font-size:16px;cursor:pointer;text-decoration:none}.secondary{background:#fff;color:#07152d}.danger{background:#b51f26;color:#fff}.success{background:#2f9d57;color:#fff}
-.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}.msg{min-height:24px;text-align:center;margin-top:12px;font-weight:800}.muted{color:#d8dfef;font-size:14px;text-align:center}
-table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radius:12px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2df9c}.pill{padding:4px 8px;border-radius:999px;background:#e7e7e7;font-weight:800;font-size:12px}
-@media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}table{font-size:12px}}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,"Noto Sans Hebrew",sans-serif;
+  background:radial-gradient(circle at top,#143f7d,#06152d 50%,#020710);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  padding:24px
+}
+
+.card{
+  width:min(1200px,98vw);
+  background:linear-gradient(180deg,#0b2b5d,#061a3b);
+  border:3px solid #d7a62d;
+  border-radius:24px;
+  box-shadow:0 20px 60px #0008,inset 0 0 0 2px #fff2a633;
+  padding:28px
+}
+
+h1{
+  color:#f6d469;
+  text-align:center;
+  margin:0 0 8px
+}
+
+p{line-height:1.55}
+
+button,.btn{
+  display:inline-block;
+  border:0;
+  border-radius:11px;
+  padding:12px 18px;
+  background:#d7a62d;
+  color:#07152d;
+  font-weight:900;
+  font-size:16px;
+  cursor:pointer;
+  text-decoration:none
+}
+
+.secondary{
+  background:#fff;
+  color:#07152d
+}
+
+.danger{
+  background:#b51f26;
+  color:#fff
+}
+
+.success{
+  background:#2f9d57;
+  color:#fff
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:18px
+}
+
+.msg{
+  min-height:24px;
+  text-align:center;
+  margin-top:12px;
+  font-weight:800
+}
+
+.muted{
+  color:#d8dfef;
+  font-size:14px;
+  text-align:center
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  color:#111;
+  border-radius:12px;
+  overflow:hidden
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:left
+}
+
+th{
+  background:#f2df9c
+}
+
+.pill{
+  padding:4px 8px;
+  border-radius:999px;
+  background:#e7e7e7;
+  font-weight:800;
+  font-size:12px
+}
+
+input.price{
+  width:110px;
+  padding:7px
+}
+
+.mini{
+  padding:7px 9px;
+  font-size:12px;
+  margin:2px
+}
+
+@media(max-width:650px){
+  table{font-size:12px}
+}
 </style>
+</head>
 
-<style>.card{width:min(1200px,98vw)} input.price{width:110px;padding:7px} .mini{padding:7px 9px;font-size:12px}</style></head>
-<body><div class="card"><h1>Master Admin</h1><p class="muted">Approve, suspend, reactivate, delete access, and set each synagogue's monthly price.</p>
-<div class="actions"><button onclick="loadMembers()">Refresh</button><button class="secondary" onclick="logoutApp()">Logout</button></div><div id="msg" class="msg"></div>
-<div style="overflow:auto;margin-top:18px"><table><thead><tr><th>Synagogue</th><th>Owner</th><th>Status</th><th>Trial</th><th>Price / month</th><th>Board</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+<body>
+
+<div class="card">
+
+<h1>Master Admin</h1>
+
+<p class="muted">
+Approve, suspend, reactivate, delete access, and set each synagogue's monthly price.
+</p>
+
+<div class="actions">
+<button onclick="loadMembers()">Refresh</button>
+<button class="secondary" onclick="openBoard()">Open Message Board</button>
+<button class="secondary" onclick="logoutApp()">Logout</button>
+</div>
+
+<div id="msg" class="msg"></div>
+
+<div style="overflow:auto;margin-top:18px">
+
+<table>
+
+<thead>
+<tr>
+<th>Synagogue</th>
+<th>Owner ID</th>
+<th>Status</th>
+<th>Trial</th>
+<th>Price / month</th>
+<th>Board</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="rows"></tbody>
+
+</table>
+
+</div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>
-const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: false,
-    storageKey: "synagogue-master-admin-auth"
+<script>
+
+const SUPABASE_URL =
+"https://chcfhxkggbrlxaopnfum.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true,
+      detectSessionInUrl:false,
+      storageKey:"synagogue-master-admin-auth"
+    }
   }
-});
+);
+
+
+const msg = document.getElementById("msg");
+const rows = document.getElementById("rows");
+
+
+function esc(x){
+  return String(x ?? "")
+  .replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
+
+
+function daysLeft(dateString){
+
+  if(!dateString) return null;
+
+  const end = new Date(dateString);
+
+  if(isNaN(end.getTime())) return null;
+
+  const difference =
+  end.getTime() - Date.now();
+
+  return Math.max(
+    0,
+    Math.ceil(difference / 86400000)
+  );
+}
+
 
 async function guard(){
 
-  const { data: { session }, error: sessionError } = await sb.auth.getSession();
-  if (sessionError || !session) {
-    location.replace("master-login.html");
+  const {
+    data:{session},
+    error:sessionError
+  } = await sb.auth.getSession();
+
+
+  if(sessionError){
+
+    console.error(sessionError);
+
+    msg.textContent =
+    "Session error: " + sessionError.message;
+
     return false;
   }
 
-  const { data: p, error: profileError } = await sb
-    .from("app_profiles")
-    .select("role,status")
-    .eq("user_id", session.user.id)
-    .maybeSingle();
 
-  if (profileError || !p) {
-    await sb.auth.signOut({ scope: "local" });
+  if(!session){
+
     location.replace("master-login.html");
+
     return false;
   }
 
-  const role = String(p.role || "").toLowerCase();
-  const status = String(p.status || "").toLowerCase();
 
-  if (role !== "master_admin" || status !== "approved") {
-    await sb.auth.signOut({ scope: "local" });
-    location.replace("master-login.html");
+  const {
+    data:profile,
+    error:profileError
+  } = await sb
+  .from("app_profiles")
+  .select("role,status")
+  .eq("user_id",session.user.id)
+  .maybeSingle();
+
+
+  if(profileError){
+
+    console.error(profileError);
+
+    msg.textContent =
+    "Profile error: " + profileError.message;
+
     return false;
   }
+
+
+  if(!profile){
+
+    msg.textContent =
+    "No master admin profile found.";
+
+    return false;
+  }
+
+
+  const role =
+  String(profile.role || "")
+  .trim()
+  .toLowerCase();
+
+
+  const status =
+  String(profile.status || "")
+  .trim()
+  .toLowerCase();
+
+
+  if(role !== "master_admin"){
+
+    msg.textContent =
+    "This account is not a master admin.";
+
+    return false;
+  }
+
+
+  if(status !== "approved"){
+
+    msg.textContent =
+    "Master admin account is not approved.";
+
+    return false;
+  }
+
 
   return true;
 }
-function esc(x){return String(x??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+
+
 async function loadMembers(){
- if(!(await guard()))return;
- msg.textContent="Loading…";
- const {data,error}=await sb.from("synagogues").select("*,profiles!synagogues_owner_user_id_fkey(email,full_name,phone)").order("created_at",{ascending:false});
- if(error){msg.textContent=error.message;return;}
- rows.innerHTML=(data||[]).map(s=>{
-   const p=s.profiles||{}; const left=s.status==="trial"?daysLeft(s.trial_ends_at):null;
-   const shownStatus=(s.status==="trial"&&left===0)?"expired":s.status;
-   return `<tr>
-   <td><strong>${esc(s.synagogue_name)}</strong><br><small>${esc(s.rabbi_name||"")}</small></td>
-   <td>${esc(p.full_name||"")}<br><small>${esc(p.email||"")}</small></td>
-   <td><span class="pill">${esc(shownStatus)}</span></td>
-   <td>${left===null?"—":left+" days"}</td>
-   <td><input class="price" id="price_${s.id}" type="number" min="0" step="0.01" value="${(Number(s.price_monthly_cents)||0)/100}"><button class="mini" onclick="setPrice('${s.id}')">Save</button></td>
-   <td><a class="btn mini secondary" target="_blank" href="index.html?s=${encodeURIComponent(s.slug)}">Open</a></td>
-   <td>
-     <button class="mini success" onclick="approve('${s.id}')">Approve + 7 days</button>
-     <button class="mini" onclick="activate('${s.id}')">Activate</button>
-     <button class="mini danger" onclick="suspendMember('${s.id}')">Suspend</button>
-     <button class="mini danger" onclick="deleteMember('${s.id}')">Delete</button>
-   </td></tr>`;
- }).join("");
- msg.textContent=`${data.length} member account(s)`;
+
+  msg.textContent = "Checking login...";
+
+
+  if(!(await guard())){
+    return;
+  }
+
+
+  msg.textContent =
+  "Loading synagogue accounts...";
+
+
+  const {
+    data,
+    error
+  } = await sb
+  .from("synagogues")
+  .select("*")
+  .order("created_at",{
+    ascending:false
+  });
+
+
+  if(error){
+
+    console.error(error);
+
+    msg.textContent =
+    "Database error: " + error.message;
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    rows.innerHTML = "";
+
+    msg.textContent =
+    "No synagogue accounts found.";
+
+    return;
+  }
+
+
+  rows.innerHTML =
+  data.map(s=>{
+
+    const left =
+    s.status === "trial"
+    ? daysLeft(s.trial_ends_at)
+    : null;
+
+
+    const shownStatus =
+    s.status === "trial" &&
+    left === 0
+    ? "expired"
+    : (s.status || "unknown");
+
+
+    const synagogueName =
+    s.synagogue_name ||
+    s.name ||
+    "Synagogue";
+
+
+    const owner =
+    s.owner_user_id ||
+    s.user_id ||
+    "—";
+
+
+    const price =
+    (Number(s.price_monthly_cents) || 0)
+    / 100;
+
+
+    return `
+
+<tr>
+
+<td>
+<strong>${esc(synagogueName)}</strong>
+<br>
+<small>${esc(s.rabbi_name || "")}</small>
+</td>
+
+
+<td>
+<small>${esc(owner)}</small>
+</td>
+
+
+<td>
+<span class="pill">
+${esc(shownStatus)}
+</span>
+</td>
+
+
+<td>
+${left === null ? "—" : left + " days"}
+</td>
+
+
+<td>
+
+<input
+class="price"
+id="price_${s.id}"
+type="number"
+min="0"
+step="0.01"
+value="${price}"
+>
+
+<button
+class="mini"
+onclick="setPrice('${s.id}')">
+Save
+</button>
+
+</td>
+
+
+<td>
+
+<a
+class="btn mini secondary"
+target="_blank"
+href="index.html">
+Open
+</a>
+
+</td>
+
+
+<td>
+
+<button
+class="mini success"
+onclick="approve('${s.id}')">
+Approve + 7 days
+</button>
+
+
+<button
+class="mini"
+onclick="activate('${s.id}')">
+Activate
+</button>
+
+
+<button
+class="mini danger"
+onclick="suspendMember('${s.id}')">
+Suspend
+</button>
+
+
+<button
+class="mini danger"
+onclick="deleteMember('${s.id}')">
+Delete
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+  }).join("");
+
+
+  msg.textContent =
+  data.length +
+  " synagogue account(s) loaded.";
+
 }
+
+
+
 async function approve(id){
- const now=new Date(), end=new Date(Date.now()+7*86400000);
- await sb.from("synagogues").update({status:"trial",trial_starts_at:now.toISOString(),trial_ends_at:end.toISOString(),approved_at:now.toISOString()}).eq("id",id); loadMembers();
+
+  const now = new Date();
+
+  const end =
+  new Date(
+    Date.now() +
+    7 * 86400000
+  );
+
+
+  const {error} =
+  await sb
+  .from("synagogues")
+  .update({
+
+    status:"trial",
+
+    trial_starts_at:
+    now.toISOString(),
+
+    trial_ends_at:
+    end.toISOString(),
+
+    approved_at:
+    now.toISOString()
+
+  })
+  .eq("id",id);
+
+
+  if(error){
+
+    msg.textContent =
+    error.message;
+
+    return;
+  }
+
+
+  loadMembers();
 }
-async function activate(id){await sb.from("synagogues").update({status:"active"}).eq("id",id);loadMembers();}
-async function suspendMember(id){await sb.from("synagogues").update({status:"suspended"}).eq("id",id);loadMembers();}
-async function deleteMember(id){if(!confirm("Delete this member's access?"))return;await sb.from("synagogues").update({status:"deleted"}).eq("id",id);loadMembers();}
-async function setPrice(id){const dollars=Number(document.getElementById("price_"+id).value)||0;await sb.from("synagogues").update({price_monthly_cents:Math.round(dollars*100)}).eq("id",id);loadMembers();}
+
+
+
+async function activate(id){
+
+  const {error} =
+  await sb
+  .from("synagogues")
+  .update({
+    status:"active"
+  })
+  .eq("id",id);
+
+
+  if(error){
+
+    msg.textContent =
+    error.message;
+
+    return;
+  }
+
+
+  loadMembers();
+}
+
+
+
+async function suspendMember(id){
+
+  const {error} =
+  await sb
+  .from("synagogues")
+  .update({
+    status:"suspended"
+  })
+  .eq("id",id);
+
+
+  if(error){
+
+    msg.textContent =
+    error.message;
+
+    return;
+  }
+
+
+  loadMembers();
+}
+
+
+
+async function deleteMember(id){
+
+  if(!confirm(
+    "Delete this member's access?"
+  )){
+    return;
+  }
+
+
+  const {error} =
+  await sb
+  .from("synagogues")
+  .update({
+    status:"deleted"
+  })
+  .eq("id",id);
+
+
+  if(error){
+
+    msg.textContent =
+    error.message;
+
+    return;
+  }
+
+
+  loadMembers();
+}
+
+
+
+async function setPrice(id){
+
+  const input =
+  document.getElementById(
+    "price_" + id
+  );
+
+
+  const dollars =
+  Number(input.value) || 0;
+
+
+  const {error} =
+  await sb
+  .from("synagogues")
+  .update({
+
+    price_monthly_cents:
+    Math.round(
+      dollars * 100
+    )
+
+  })
+  .eq("id",id);
+
+
+  if(error){
+
+    msg.textContent =
+    error.message;
+
+    return;
+  }
+
+
+  loadMembers();
+}
+
+
+
+function openBoard(){
+
+  window.open(
+    "index.html",
+    "_blank"
+  );
+
+}
+
+
+
+async function logoutApp(){
+
+  await sb.auth.signOut({
+    scope:"local"
+  });
+
+  location.replace(
+    "master-login.html"
+  );
+
+}
+
+
 loadMembers();
-</script></body></html>
+
+</script>
+
+</body>
+</html>
