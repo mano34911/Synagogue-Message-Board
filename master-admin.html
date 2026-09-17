@@ -14,11 +14,21 @@ table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radi
 <body><div class="card"><h1>Master Admin</h1><p class="muted">Approve, suspend, reactivate, delete access, and set each synagogue's monthly price.</p>
 <div class="actions"><button onclick="loadMembers()">Refresh</button><button class="secondary" onclick="logoutApp()">Logout</button></div><div id="msg" class="msg"></div>
 <div style="overflow:auto;margin-top:18px"><table><thead><tr><th>Synagogue</th><th>Owner</th><th>Status</th><th>Trial</th><th>Price / month</th><th>Board</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="supabase-config.js"></script><script src="saas-common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-let sb;
+const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storageKey: "synagogue-master-admin-auth"
+  }
+});
+
 async function guard(){
-  sb=getSupabase();
 
   const { data: { session }, error: sessionError } = await sb.auth.getSession();
   if (sessionError || !session) {
