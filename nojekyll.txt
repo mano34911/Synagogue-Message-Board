@@ -1,0 +1,2 @@
+# Rename this file to .nojekyll in the repository root.
+# GitHub Pages will then serve the site as plain static files without Jekyll processing.

@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="he" dir="rtl" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="he">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101b43">
+  <title>תשלום מנוי</title>
+
+  <style>
+    :root{
+      --navy:#101b43;
+      --navy2:#17285e;
+      --gold:#c79b43;
+      --gold2:#f0d48a;
+      --cream:#fff8df;
+      --line:#d2b15d;
+      --ink:#241d11;
+      --green:#0f7d49;
+      --red:#a12a2a;
+      --blue:#234c9b;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      background:
+        radial-gradient(circle at top,#263560 0,#10182f 38%,#070a12 80%);
+      color:var(--ink);
+    }
+
+    body{
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      padding:16px;
+    }
+
+    .wrap{
+      width:min(760px,100%);
+      background:linear-gradient(180deg,#fffdf6,#fff4d4);
+      border:4px solid var(--gold);
+      border-radius:26px;
+      box-shadow:
+        0 0 0 3px #fff0a4,
+        0 20px 60px #0009;
+      overflow:hidden;
+    }
+
+    .head{
+      background:linear-gradient(180deg,var(--navy2),var(--navy));
+      color:#fff;
+      text-align:center;
+      padding:22px 18px;
+      border-bottom:4px solid var(--gold);
+    }
+
+    .head h1{
+      margin:0;
+      color:#fff3bd;
+      font-size:clamp(28px,5vw,42px);
+    }
+
+    .head p{
+      margin:7px 0 0;
+      color:#ead58c;
+      font-weight:700;
+    }
+
+    .body{
+      padding:20px;
+    }
+
+    .plan{
+      border:3px solid var(--gold);
+      border-radius:20px;
+      background:#fffdf6;
+      padding:18px;
+      text-align:center;
+      margin-bottom:16px;
+    }
+
+    .plan .price{
+      font-size:48px;
+      font-weight:900;
+      color:#102052;
+      direction:ltr;
+    }
+
+    .plan .price small{
+      font-size:18px;
+      color:#685a35;
+    }
+
+    .plan .trial{
+      margin-top:8px;
+      font-weight:900;
+      color:var(--green);
+      font-size:20px;
+    }
+
+    .plan ul{
+      text-align:right;
+      margin:18px auto 0;
+      padding-right:22px;
+      max-width:520px;
+      line-height:1.8;
+      font-weight:700;
+      color:#3c3523;
+    }
+
+    .status{
+      border:2px solid var(--line);
+      background:#fffdf4;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      color:#283661;
+      min-height:46px;
+      display:flex;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .account{
+      border:2px solid #dbc77f;
+      border-radius:14px;
+      background:#fffaf0;
+      padding:12px;
+      margin-bottom:14px;
+    }
+
+    .account div{
+      margin:4px 0;
+      font-weight:700;
+    }
+
+    .actions{
+      display:grid;
+      gap:10px;
+    }
+
+    button,
+    a.btn{
+      width:100%;
+      border:0;
+      border-radius:13px;
+      padding:13px 14px;
+      font-size:17px;
+      font-weight:900;
+      cursor:pointer;
+      text-decoration:none;
+      text-align:center;
+      display:block;
+    }
+
+    .pay{
+      background:var(--green);
+      color:#fff;
+    }
+
+    .pay:disabled{
+      opacity:.6;
+      cursor:wait;
+    }
+
+    .secondary{
+      background:#132451;
+      color:#fff;
+      border:2px solid #d5b35d !important;
+    }
+
+    .logout{
+      background:#982c2c;
+      color:#fff;
+    }
+
+    .note{
+      margin-top:14px;
+      text-align:center;
+      font-size:13px;
+      color:#665b3d;
+      line-height:1.55;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="head">
+      <h1>מנוי לוח בית הכנסת</h1>
+      <p>7 ימים ניסיון חינם ולאחר מכן $25 לחודש</p>
+    </header>
+
+    <section class="body">
+      <div class="plan">
+        <div class="price">$25 <small>/ חודש</small></div>
+        <div class="trial">7 ימים ניסיון חינם</div>
+
+        <ul>
+          <li>ניהול לוח בית הכנסת</li>
+          <li>זמני תפילה, שיעור יומי והודעות</li>
+          <li>ניהול חברים ואישורים</li>
+          <li>עדכונים חיים דרך Supabase</li>
+          <li>ביטול מנוי בהתאם לתנאי ספק התשלום</li>
+        </ul>
+      </div>
+
+      <div class="status" id="status">בודק חשבון ומנוי...</div>
+
+      <div class="account">
+        <div>אימייל: <span id="emailValue">—</span></div>
+        <div>סטטוס מנוי: <span id="subscriptionValue">—</span></div>
+        <div>תקופת ניסיון: <span id="trialValue">—</span></div>
+      </div>
+
+      <div class="actions">
+        <button class="pay" id="subscribeBtn" type="button">התחל ניסיון חינם / הפעל מנוי</button>
+        <a class="btn secondary" href="admin.html">חזרה לניהול</a>
+        <a class="btn secondary" href="index.html">חזרה ללוח</a>
+        <button class="logout" id="logoutBtn" type="button">התנתק</button>
+      </div>
+
+      <div class="note">
+        כפתור התשלום יפנה ל-Supabase Edge Function בשם
+        <b>create-paypal-subscription</b>.
+        כאשר נגדיר את PayPal בהמשך, אין צורך לשנות את עיצוב הדף הזה.
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById("status");
+    const emailValue = document.getElementById("emailValue");
+    const subscriptionValue = document.getElementById("subscriptionValue");
+    const trialValue = document.getElementById("trialValue");
+    const subscribeBtn = document.getElementById("subscribeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let currentUser = null;
+    let currentMember = null;
+
+    function setStatus(text, type="normal"){
+      statusEl.textContent = text;
+
+      if(type === "ok"){
+        statusEl.style.background = "#e8fff2";
+        statusEl.style.borderColor = "#57a67c";
+        statusEl.style.color = "#155936";
+      }else if(type === "bad"){
+        statusEl.style.background = "#fff0f0";
+        statusEl.style.borderColor = "#c56b6b";
+        statusEl.style.color = "#7d2020";
+      }else{
+        statusEl.style.background = "#fffdf4";
+        statusEl.style.borderColor = "#d2b15d";
+        statusEl.style.color = "#283661";
+      }
+    }
+
+    function formatDate(value){
+      if(!value) return "—";
+      const d = new Date(value);
+      if(Number.isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("he-IL");
+    }
+
+    async function requireLogin(){
+      const { data, error } = await sb.auth.getSession();
+
+      if(error || !data.session){
+        location.href = "login.html";
+        return false;
+      }
+
+      currentUser = data.session.user;
+      emailValue.textContent = currentUser.email || "—";
+      return true;
+    }
+
+    async function loadMember(){
+      try{
+        const { data, error } = await sb
+          .from("members")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        currentMember = data || null;
+
+        if(!currentMember){
+          subscriptionValue.textContent = "לא נמצא כרטיס חבר";
+          trialValue.textContent = "—";
+          setStatus("החשבון קיים, אך עדיין אין רשומת חבר.", "normal");
+          return;
+        }
+
+        const subStatus =
+          currentMember.subscription_status ||
+          currentMember.status ||
+          "pending";
+
+        subscriptionValue.textContent = subStatus;
+
+        const trialEnd =
+          currentMember.trial_ends_at ||
+          currentMember.trial_end ||
+          null;
+
+        trialValue.textContent = trialEnd ? formatDate(trialEnd) : "7 ימים מהפעלת המנוי";
+
+        if(
+          subStatus === "active" ||
+          subStatus === "trialing"
+        ){
+          setStatus("המנוי פעיל.", "ok");
+          subscribeBtn.textContent = "המנוי כבר פעיל";
+          subscribeBtn.disabled = true;
+        }else{
+          setStatus("ניתן להתחיל את תקופת הניסיון.", "normal");
+        }
+
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה בטעינת פרטי המנוי: " + (err.message || err), "bad");
+      }
+    }
+
+    async function startSubscription(){
+      subscribeBtn.disabled = true;
+      subscribeBtn.textContent = "פותח תשלום...";
+      setStatus("יוצר מנוי PayPal...");
+
+      try{
+        const { data, error } = await sb.functions.invoke(
+          "create-paypal-subscription",
+          {
+            body:{
+              user_id: currentUser.id,
+              email: currentUser.email,
+              member_id: currentMember?.id || null,
+              return_url: new URL("payment.html?payment=success", location.href).href,
+              cancel_url: new URL("payment.html?payment=cancelled", location.href).href
+            }
+          }
+        );
+
+        if(error) throw error;
+
+        const approvalUrl =
+          data?.approval_url ||
+          data?.approve_url ||
+          data?.url ||
+          null;
+
+        if(!approvalUrl){
+          throw new Error("לא התקבל קישור PayPal מהשרת.");
+        }
+
+        location.href = approvalUrl;
+
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה ביצירת המנוי: " + (err.message || err), "bad");
+        subscribeBtn.disabled = false;
+        subscribeBtn.textContent = "התחל ניסיון חינם / הפעל מנוי";
+      }
+    }
+
+    subscribeBtn.addEventListener("click", startSubscription);
+
+    logoutBtn.addEventListener("click", async ()=>{
+      try{
+        await sb.auth.signOut();
+      }catch(e){
+        console.warn(e);
+      }
+      location.href = "login.html";
+    });
+
+    (async()=>{
+      const params = new URLSearchParams(location.search);
+
+      if(params.get("payment") === "success"){
+        setStatus("חזרת בהצלחה מ-PayPal. בודק את המנוי...", "ok");
+      }else if(params.get("payment") === "cancelled"){
+        setStatus("התשלום בוטל. לא בוצע חיוב.", "normal");
+      }
+
+      const ok = await requireLogin();
+      if(!ok) return;
+
+      await loadMember();
+    })();
+  </script>
+</body>
+</html>

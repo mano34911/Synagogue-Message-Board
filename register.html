@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="he" dir="rtl" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="he">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101b43">
+  <title>הרשמת חבר לבית הכנסת</title>
+
+  <style>
+    :root{
+      --navy:#101b43;
+      --navy2:#17285e;
+      --gold:#c79b43;
+      --gold2:#f0d48a;
+      --cream:#fff8df;
+      --line:#d2b15d;
+      --ink:#241d11;
+      --green:#0f7d49;
+      --red:#a12a2a;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      background:
+        radial-gradient(circle at top,#263560 0,#10182f 38%,#070a12 80%);
+      color:var(--ink);
+    }
+
+    body{
+      min-height:100dvh;
+      padding:16px;
+    }
+
+    .wrap{
+      width:min(900px,100%);
+      margin:auto;
+      background:linear-gradient(180deg,#fffdf6,#fff4d4);
+      border:4px solid var(--gold);
+      border-radius:26px;
+      box-shadow:
+        0 0 0 3px #fff0a4,
+        0 20px 60px #0009;
+      overflow:hidden;
+    }
+
+    .head{
+      background:linear-gradient(180deg,var(--navy2),var(--navy));
+      color:#fff;
+      text-align:center;
+      padding:22px 18px;
+      border-bottom:4px solid var(--gold);
+    }
+
+    .head h1{
+      margin:0;
+      color:#fff3bd;
+      font-size:clamp(28px,5vw,42px);
+    }
+
+    .head p{
+      margin:7px 0 0;
+      color:#ead58c;
+      font-weight:700;
+    }
+
+    .body{
+      padding:20px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .full{
+      grid-column:1/-1;
+    }
+
+    label{
+      display:block;
+      font-weight:800;
+      margin:4px 0 6px;
+      color:#24315d;
+    }
+
+    input,select,textarea{
+      width:100%;
+      border:2px solid var(--line);
+      border-radius:12px;
+      padding:12px 13px;
+      font-size:16px;
+      background:#fff;
+      outline:none;
+    }
+
+    textarea{
+      min-height:100px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    input:focus,select:focus,textarea:focus{
+      border-color:#224b9a;
+      box-shadow:0 0 0 3px #224b9a22;
+    }
+
+    .ltr{
+      direction:ltr;
+      text-align:left;
+    }
+
+    .status{
+      margin-top:16px;
+      border:2px solid var(--line);
+      background:#fffdf4;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      color:#283661;
+      min-height:46px;
+      display:flex;
+      align-items:center;
+    }
+
+    .actions{
+      display:grid;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    button.main,
+    a.linkbtn{
+      width:100%;
+      border:0;
+      border-radius:13px;
+      padding:12px 14px;
+      font-size:17px;
+      font-weight:900;
+      cursor:pointer;
+      text-decoration:none;
+      text-align:center;
+      display:block;
+    }
+
+    button.main{
+      background:var(--green);
+      color:#fff;
+    }
+
+    button.main:disabled{
+      opacity:.6;
+      cursor:wait;
+    }
+
+    a.linkbtn{
+      background:#132451;
+      color:#fff;
+      border:2px solid #d5b35d;
+    }
+
+    .note{
+      text-align:center;
+      margin-top:14px;
+      color:#665b3d;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    @media(max-width:700px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+      .full{
+        grid-column:auto;
+      }
+      body{
+        padding:7px;
+      }
+      .body{
+        padding:14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="head">
+      <h1>הרשמת חבר לבית הכנסת</h1>
+      <p>יצירת חשבון חדש למערכת לוח בית הכנסת</p>
+    </header>
+
+    <section class="body">
+      <form id="registerForm">
+        <div class="grid">
+          <div>
+            <label for="first_name">שם פרטי</label>
+            <input id="first_name" type="text" required>
+          </div>
+
+          <div>
+            <label for="last_name">שם משפחה</label>
+            <input id="last_name" type="text" required>
+          </div>
+
+          <div>
+            <label for="email">אימייל</label>
+            <input id="email" class="ltr" type="email" autocomplete="email" required>
+          </div>
+
+          <div>
+            <label for="phone">טלפון</label>
+            <input id="phone" class="ltr" type="tel" autocomplete="tel">
+          </div>
+
+          <div>
+            <label for="password">סיסמה</label>
+            <input id="password" class="ltr" type="password" autocomplete="new-password" minlength="6" required>
+          </div>
+
+          <div>
+            <label for="confirm_password">אימות סיסמה</label>
+            <input id="confirm_password" class="ltr" type="password" autocomplete="new-password" minlength="6" required>
+          </div>
+
+          <div class="full">
+            <label for="synagogue_name">שם בית הכנסת</label>
+            <input id="synagogue_name" type="text" required>
+          </div>
+
+          <div class="full">
+            <label for="street_address">כתובת רחוב</label>
+            <input id="street_address" type="text" autocomplete="street-address">
+          </div>
+
+          <div>
+            <label for="city">עיר</label>
+            <input id="city" type="text" autocomplete="address-level2">
+          </div>
+
+          <div>
+            <label for="state">מדינה / מחוז</label>
+            <input id="state" type="text" autocomplete="address-level1">
+          </div>
+
+          <div>
+            <label for="zip_code">מיקוד</label>
+            <input id="zip_code" class="ltr" type="text" autocomplete="postal-code">
+          </div>
+
+          <div>
+            <label for="country">מדינה</label>
+            <input id="country" type="text" value="United States">
+          </div>
+
+          <div>
+            <label for="referred_by">הופנית על ידי</label>
+            <input id="referred_by" type="text">
+          </div>
+
+          <div>
+            <label for="role">תפקיד</label>
+            <select id="role">
+              <option value="member">חבר</option>
+              <option value="rabbi">רב</option>
+              <option value="admin">מנהל בית כנסת</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="notes">הערות</label>
+            <textarea id="notes"></textarea>
+          </div>
+        </div>
+
+        <div class="status" id="status">מלא את הפרטים ושלח הרשמה.</div>
+
+        <div class="actions">
+          <button class="main" id="registerBtn" type="submit">שלח הרשמה</button>
+          <a class="linkbtn" href="login.html">כבר יש לי חשבון</a>
+          <a class="linkbtn" href="index.html">חזרה ללוח</a>
+        </div>
+      </form>
+
+      <div class="note">
+        החשבון ייווצר במצב ממתין עד לאישור מנהל המערכת.
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById("registerForm");
+    const statusEl = document.getElementById("status");
+    const registerBtn = document.getElementById("registerBtn");
+
+    function setStatus(text, type="normal"){
+      statusEl.textContent = text;
+
+      if(type === "ok"){
+        statusEl.style.background = "#e8fff2";
+        statusEl.style.borderColor = "#57a67c";
+        statusEl.style.color = "#155936";
+      }else if(type === "bad"){
+        statusEl.style.background = "#fff0f0";
+        statusEl.style.borderColor = "#c56b6b";
+        statusEl.style.color = "#7d2020";
+      }else{
+        statusEl.style.background = "#fffdf4";
+        statusEl.style.borderColor = "#d2b15d";
+        statusEl.style.color = "#283661";
+      }
+    }
+
+    form.addEventListener("submit", async (event)=>{
+      event.preventDefault();
+
+      const first_name = document.getElementById("first_name").value.trim();
+      const last_name = document.getElementById("last_name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+      const confirm_password = document.getElementById("confirm_password").value;
+      const synagogue_name = document.getElementById("synagogue_name").value.trim();
+      const street_address = document.getElementById("street_address").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const state = document.getElementById("state").value.trim();
+      const zip_code = document.getElementById("zip_code").value.trim();
+      const country = document.getElementById("country").value.trim();
+      const referred_by = document.getElementById("referred_by").value.trim();
+      const role = document.getElementById("role").value;
+      const notes = document.getElementById("notes").value.trim();
+
+      if(!first_name || !last_name || !email || !password || !synagogue_name){
+        setStatus("נא למלא את כל שדות החובה.", "bad");
+        return;
+      }
+
+      if(password.length < 6){
+        setStatus("הסיסמה חייבת להכיל לפחות 6 תווים.", "bad");
+        return;
+      }
+
+      if(password !== confirm_password){
+        setStatus("הסיסמאות אינן תואמות.", "bad");
+        return;
+      }
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = "שולח...";
+      setStatus("יוצר חשבון...");
+
+      try{
+        const { data: signUpData, error: signUpError } = await sb.auth.signUp({
+          email,
+          password,
+          options:{
+            data:{
+              first_name,
+              last_name,
+              synagogue_name
+            }
+          }
+        });
+
+        if(signUpError) throw signUpError;
+
+        const user = signUpData.user;
+
+        if(!user){
+          throw new Error("לא התקבל משתמש חדש מהמערכת.");
+        }
+
+        const profilePayload = {
+          user_id: user.id,
+          first_name,
+          last_name,
+          email,
+          phone,
+          synagogue_name,
+          street_address,
+          city,
+          state,
+          zip_code,
+          country,
+          referred_by,
+          requested_role: role,
+          notes,
+          status: "pending",
+          approved: false,
+          created_at: new Date().toISOString()
+        };
+
+        const { error: profileError } = await sb
+          .from("members")
+          .insert(profilePayload);
+
+        if(profileError) throw profileError;
+
+        setStatus("ההרשמה נשלחה בהצלחה וממתינה לאישור מנהל.", "ok");
+        form.reset();
+        document.getElementById("country").value = "United States";
+
+        setTimeout(()=>{
+          location.href = "login.html";
+        }, 1800);
+
+      }catch(err){
+        console.error(err);
+
+        let msg = err?.message || "אירעה שגיאה בהרשמה.";
+
+        if(msg.toLowerCase().includes("user already registered")){
+          msg = "האימייל הזה כבר רשום במערכת.";
+        }else if(msg.toLowerCase().includes("duplicate key")){
+          msg = "החשבון או הרשומה כבר קיימים.";
+        }
+
+        setStatus(msg, "bad");
+      }finally{
+        registerBtn.disabled = false;
+        registerBtn.textContent = "שלח הרשמה";
+      }
+    });
+  </script>
+</body>
+</html>

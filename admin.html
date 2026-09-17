@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="he" dir="rtl" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="he">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101b43">
+  <title>ניהול לוח בית הכנסת</title>
+
+  <style>
+    :root{
+      --navy:#101b43;
+      --navy2:#17285e;
+      --gold:#c79b43;
+      --gold2:#f0d48a;
+      --cream:#fff8df;
+      --ink:#241d11;
+      --green:#0d7a45;
+      --red:#a32222;
+      --line:#d4b15e;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      background:#06163a;
+      color:var(--ink);
+    }
+
+    body{padding:14px}
+
+    .wrap{
+      max-width:1200px;
+      margin:auto;
+      background:var(--cream);
+      border:4px solid var(--gold);
+      border-radius:24px;
+      box-shadow:0 0 0 3px #fff0a4,0 18px 50px #0008;
+      overflow:hidden;
+    }
+
+    .top{
+      background:linear-gradient(180deg,var(--navy2),var(--navy));
+      color:#fff;
+      padding:16px;
+      border-bottom:4px solid var(--gold);
+      text-align:center;
+      position:relative;
+    }
+
+    .top h1{
+      margin:0;
+      font-size:clamp(27px,4vw,42px);
+      color:#fff5c9;
+    }
+
+    .top p{
+      margin:5px 0 0;
+      color:#f3d98a;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    button,a.btn{
+      border:0;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-block;
+    }
+
+    .btn-primary{
+      background:#d4aa41;
+      color:#15204b;
+    }
+
+    .btn-dark{
+      background:#0b1941;
+      color:#fff;
+      border:2px solid #e1bd63;
+    }
+
+    .btn-red{
+      background:#9f2a2a;
+      color:#fff;
+    }
+
+    .content{
+      padding:16px;
+    }
+
+    .status{
+      margin-bottom:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#fffdf4;
+      border:2px solid var(--line);
+      font-weight:800;
+      color:#24315d;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:#fffdf6;
+      border:2px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 5px 14px #0001;
+    }
+
+    .card.full{grid-column:1/-1}
+
+    .card h2{
+      margin:0 0 12px;
+      color:#102052;
+      font-size:22px;
+      border-bottom:2px solid #e6d08d;
+      padding-bottom:7px;
+    }
+
+    label{
+      display:block;
+      font-weight:800;
+      color:#2f2a1c;
+      margin:10px 0 5px;
+    }
+
+    input,textarea,select{
+      width:100%;
+      border:2px solid #c6a250;
+      background:#fff;
+      border-radius:10px;
+      padding:10px 11px;
+      font-size:16px;
+      color:#211b10;
+      outline:none;
+    }
+
+    textarea{
+      min-height:120px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    textarea.large{
+      min-height:260px;
+    }
+
+    input:focus,textarea:focus,select:focus{
+      border-color:#173c89;
+      box-shadow:0 0 0 3px #173c8922;
+    }
+
+    .three{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+      position:sticky;
+      bottom:8px;
+      background:#fff5d7ee;
+      padding:10px;
+      border:2px solid #d2b15b;
+      border-radius:15px;
+      backdrop-filter:blur(7px);
+    }
+
+    .actions button{min-width:140px}
+
+    .save{
+      background:#0d7a45;
+      color:#fff;
+    }
+
+    .reload{
+      background:#183d88;
+      color:#fff;
+    }
+
+    .note{
+      font-size:13px;
+      color:#665b3c;
+      margin-top:6px;
+      line-height:1.4;
+    }
+
+    .hidden{display:none!important}
+
+    @media(max-width:800px){
+      .grid{grid-template-columns:1fr}
+      .card.full{grid-column:auto}
+      .three,.two{grid-template-columns:1fr}
+      body{padding:7px}
+      .content{padding:10px}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1>ניהול לוח בית הכנסת</h1>
+      <p>עדכון תוכן, תפילות, זמני היום והודעות</p>
+
+      <div class="top-actions">
+        <a class="btn btn-dark" href="index.html">פתח את הלוח</a>
+        <a class="btn btn-dark" href="master-admin.html">Master Admin</a>
+        <button class="btn btn-red" id="logoutBtn" type="button">התנתק</button>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="status" id="status">בודק התחברות...</div>
+
+      <form id="adminForm" class="grid">
+        <section class="card">
+          <h2>פרטי בית הכנסת</h2>
+
+          <label for="synagogue_name">שם בית הכנסת</label>
+          <input id="synagogue_name" name="synagogue_name" type="text">
+
+          <label for="rabbi_name">שם הרב / שורת משנה</label>
+          <input id="rabbi_name" name="rabbi_name" type="text">
+
+          <label for="main_message">הודעה ראשית</label>
+          <textarea id="main_message" name="main_message"></textarea>
+
+          <label for="side_message">הודעת היום</label>
+          <textarea id="side_message" name="side_message"></textarea>
+        </section>
+
+        <section class="card">
+          <h2>זמני תפילה</h2>
+
+          <div class="three">
+            <div>
+              <label for="shacharit">שחרית</label>
+              <input id="shacharit" name="shacharit" type="time">
+            </div>
+
+            <div>
+              <label for="mincha">מנחה</label>
+              <input id="mincha" name="mincha" type="time">
+            </div>
+
+            <div>
+              <label for="maariv">ערבית</label>
+              <input id="maariv" name="maariv" type="time">
+            </div>
+          </div>
+
+          <label for="parasha">פרשת השבוע</label>
+          <input id="parasha" name="parasha" type="text">
+
+          <div class="two">
+            <div>
+              <label for="candle_lighting">כניסת שבת</label>
+              <input id="candle_lighting" name="candle_lighting" type="text">
+            </div>
+
+            <div>
+              <label for="shabbat_end">צאת שבת</label>
+              <input id="shabbat_end" name="shabbat_end" type="text">
+            </div>
+          </div>
+        </section>
+
+        <section class="card full">
+          <h2>שיעור יומי</h2>
+
+          <div class="two">
+            <div>
+              <label for="daily_title">כותרת מרכזית</label>
+              <input id="daily_title" name="daily_title" type="text">
+            </div>
+
+            <div>
+              <label for="lesson_title">כותרת השיעור</label>
+              <input id="lesson_title" name="lesson_title" type="text">
+            </div>
+          </div>
+
+          <label for="lesson_text">תוכן השיעור</label>
+          <textarea class="large" id="lesson_text" name="lesson_text"></textarea>
+
+          <label for="prayer_scroll_speed">מהירות גלילה</label>
+          <input id="prayer_scroll_speed" name="prayer_scroll_speed" type="number" min="4" max="100" step="1">
+
+          <div class="note">
+            מספר גבוה יותר = גלילה מהירה יותר.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>זמני היום</h2>
+
+          <label for="alot">עלות השחר</label>
+          <input id="alot" name="alot" type="text">
+
+          <label for="misheyakir">טלית ותפילין</label>
+          <input id="misheyakir" name="misheyakir" type="text">
+
+          <label for="sunrise">הנץ החמה</label>
+          <input id="sunrise" name="sunrise" type="text">
+
+          <label for="shema">סוף זמן שמע</label>
+          <input id="shema" name="shema" type="text">
+        </section>
+
+        <section class="card">
+          <h2>זמנים נוספים</h2>
+
+          <label for="chatzot">חצות היום</label>
+          <input id="chatzot" name="chatzot" type="text">
+
+          <label for="sunset">שקיעה</label>
+          <input id="sunset" name="sunset" type="text">
+
+          <label for="tzeit">צאת הכוכבים</label>
+          <input id="tzeit" name="tzeit" type="text">
+
+          <label for="ticker_text">טקסט רץ</label>
+          <textarea id="ticker_text" name="ticker_text"></textarea>
+        </section>
+      </form>
+
+      <div class="actions">
+        <button class="save" id="saveBtn" type="button">שמור הכל</button>
+        <button class="reload" id="reloadBtn" type="button">טען מחדש</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const DEFAULTS = {
+      id: 1,
+      synagogue_name: "בית הכנסת בית תורה",
+      rabbi_name: "ברוכים הבאים",
+      daily_title: "שיעור יומי",
+      main_message: "ברוכים הבאים לבית הכנסת",
+      lesson_title: "שיעור יומי",
+      lesson_text: "השיעור היומי יתעדכן אוטומטית ממערכת הניהול.",
+      ticker_text: "לעילוי נשמת • לרפואה שלמה • להצלחה ולברכה",
+      side_message: "נא לעדכן הודעות דרך מערכת הניהול",
+      shacharit: "07:00",
+      mincha: "18:30",
+      maariv: "19:15",
+      candle_lighting: "—",
+      shabbat_end: "—",
+      parasha: "—",
+      alot: "—",
+      misheyakir: "—",
+      sunrise: "—",
+      shema: "—",
+      chatzot: "—",
+      sunset: "—",
+      tzeit: "—",
+      prayer_scroll_speed: 28
+    };
+
+    const fieldNames = [
+      "synagogue_name",
+      "rabbi_name",
+      "daily_title",
+      "main_message",
+      "lesson_title",
+      "lesson_text",
+      "ticker_text",
+      "side_message",
+      "shacharit",
+      "mincha",
+      "maariv",
+      "candle_lighting",
+      "shabbat_end",
+      "parasha",
+      "alot",
+      "misheyakir",
+      "sunrise",
+      "shema",
+      "chatzot",
+      "sunset",
+      "tzeit",
+      "prayer_scroll_speed"
+    ];
+
+    const statusEl = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function setStatus(text, type="normal"){
+      statusEl.textContent = text;
+
+      if(type === "ok"){
+        statusEl.style.background = "#e8fff2";
+        statusEl.style.borderColor = "#55a87a";
+        statusEl.style.color = "#155936";
+      }else if(type === "bad"){
+        statusEl.style.background = "#fff0f0";
+        statusEl.style.borderColor = "#c96a6a";
+        statusEl.style.color = "#7d1f1f";
+      }else{
+        statusEl.style.background = "#fffdf4";
+        statusEl.style.borderColor = "#d4b15e";
+        statusEl.style.color = "#24315d";
+      }
+    }
+
+    function fillForm(data){
+      const d = {...DEFAULTS, ...(data || {})};
+
+      for(const name of fieldNames){
+        const el = document.getElementById(name);
+        if(!el) continue;
+
+        if(name === "prayer_scroll_speed"){
+          el.value = Number(d[name] ?? 28);
+        }else{
+          el.value = d[name] ?? "";
+        }
+      }
+    }
+
+    function getFormData(){
+      const data = {};
+
+      for(const name of fieldNames){
+        const el = document.getElementById(name);
+        if(!el) continue;
+
+        if(name === "prayer_scroll_speed"){
+          data[name] = Number(el.value || 28);
+        }else{
+          data[name] = el.value.trim();
+        }
+      }
+
+      return data;
+    }
+
+    async function requireLogin(){
+      const { data, error } = await sb.auth.getSession();
+
+      if(error){
+        console.error(error);
+        location.href = "login.html";
+        return false;
+      }
+
+      if(!data.session){
+        location.href = "login.html";
+        return false;
+      }
+
+      return true;
+    }
+
+    async function loadBoard(){
+      setStatus("טוען נתונים...");
+
+      try{
+        const { data, error } = await sb
+          .from("board_settings")
+          .select("*")
+          .eq("id", 1)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(data){
+          fillForm(data);
+          setStatus("הנתונים נטענו בהצלחה", "ok");
+        }else{
+          fillForm(DEFAULTS);
+          setStatus("לא נמצאה שורה קיימת. הנתונים הראשוניים מוכנים לשמירה.", "normal");
+        }
+      }catch(err){
+        console.error(err);
+        fillForm(DEFAULTS);
+        setStatus("שגיאה בטעינת הנתונים: " + (err.message || err), "bad");
+      }
+    }
+
+    async function saveBoard(){
+      saveBtn.disabled = true;
+      saveBtn.textContent = "שומר...";
+      setStatus("שומר נתונים...");
+
+      try{
+        const payload = {
+          id: 1,
+          ...getFormData(),
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await sb
+          .from("board_settings")
+          .upsert(payload, { onConflict: "id" });
+
+        if(error) throw error;
+
+        setStatus("הכל נשמר בהצלחה", "ok");
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה בשמירה: " + (err.message || err), "bad");
+      }finally{
+        saveBtn.disabled = false;
+        saveBtn.textContent = "שמור הכל";
+      }
+    }
+
+    async function logout(){
+      try{
+        await sb.auth.signOut();
+      }catch(e){
+        console.warn(e);
+      }
+
+      location.href = "login.html";
+    }
+
+    saveBtn.addEventListener("click", saveBoard);
+    reloadBtn.addEventListener("click", loadBoard);
+    logoutBtn.addEventListener("click", logout);
+
+    (async()=>{
+      const ok = await requireLogin();
+      if(!ok) return;
+      await loadBoard();
+    })();
+  </script>
+</body>
+</html>

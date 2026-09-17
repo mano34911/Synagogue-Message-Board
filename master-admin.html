@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="he" dir="rtl" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="he">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101b43">
+  <title>Master Admin</title>
+
+  <style>
+    :root{
+      --navy:#101b43;
+      --navy2:#17285e;
+      --gold:#c79b43;
+      --gold2:#f0d48a;
+      --cream:#fff8df;
+      --line:#d2b15d;
+      --ink:#241d11;
+      --green:#0f7d49;
+      --red:#a12a2a;
+      --blue:#234c9b;
+      --gray:#6e6e6e;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      background:#07163c;
+      color:var(--ink);
+    }
+
+    body{
+      padding:14px;
+    }
+
+    .wrap{
+      width:min(1250px,100%);
+      margin:auto;
+      background:linear-gradient(180deg,#fffdf6,#fff4d4);
+      border:4px solid var(--gold);
+      border-radius:26px;
+      box-shadow:
+        0 0 0 3px #fff0a4,
+        0 20px 60px #0009;
+      overflow:hidden;
+    }
+
+    .head{
+      background:linear-gradient(180deg,var(--navy2),var(--navy));
+      color:#fff;
+      padding:18px;
+      border-bottom:4px solid var(--gold);
+      text-align:center;
+    }
+
+    .head h1{
+      margin:0;
+      color:#fff3bd;
+      font-size:clamp(28px,4vw,42px);
+    }
+
+    .head p{
+      margin:6px 0 0;
+      color:#ead58c;
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .btn,
+    button{
+      border:0;
+      border-radius:11px;
+      padding:9px 12px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-block;
+      font-size:14px;
+    }
+
+    .btn-dark{background:#0e1e4c;color:#fff;border:2px solid #d6b55f}
+    .btn-blue{background:var(--blue);color:#fff}
+    .btn-green{background:var(--green);color:#fff}
+    .btn-red{background:var(--red);color:#fff}
+    .btn-gray{background:var(--gray);color:#fff}
+
+    .content{
+      padding:16px;
+    }
+
+    .status{
+      margin-bottom:14px;
+      border:2px solid var(--line);
+      background:#fffdf4;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      color:#283661;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .stat{
+      background:#fff;
+      border:2px solid var(--line);
+      border-radius:15px;
+      padding:12px;
+      text-align:center;
+    }
+
+    .stat .n{
+      font-size:28px;
+      font-weight:900;
+      color:#14285f;
+    }
+
+    .stat .t{
+      margin-top:4px;
+      font-weight:800;
+      color:#6a5a35;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr auto;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    input,select{
+      width:100%;
+      border:2px solid var(--line);
+      border-radius:10px;
+      padding:10px 11px;
+      font-size:15px;
+      background:#fff;
+      outline:none;
+    }
+
+    input:focus,select:focus{
+      border-color:#224b9a;
+      box-shadow:0 0 0 3px #224b9a22;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:2px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1050px;
+    }
+
+    th,td{
+      padding:10px 9px;
+      border-bottom:1px solid #eadcae;
+      text-align:right;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      background:#132451;
+      color:#fff3bd;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:hover td{
+      background:#fffaf0;
+    }
+
+    .badge{
+      display:inline-block;
+      border-radius:999px;
+      padding:4px 9px;
+      font-weight:800;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .pending{background:#fff0b8;color:#725700}
+    .approved{background:#dff7e9;color:#17603b}
+    .suspended{background:#ffe0e0;color:#8a2525}
+    .rejected{background:#f0e0e0;color:#6d2b2b}
+
+    .row-actions{
+      display:flex;
+      gap:5px;
+      flex-wrap:wrap;
+    }
+
+    .empty{
+      padding:30px;
+      text-align:center;
+      color:#6a5a35;
+      font-weight:800;
+    }
+
+    @media(max-width:850px){
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .filters{grid-template-columns:1fr}
+      body{padding:7px}
+      .content{padding:10px}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="head">
+      <h1>Master Admin</h1>
+      <p>ניהול חברים, אישורים והשעיות</p>
+
+      <div class="top-actions">
+        <a class="btn btn-dark" href="index.html">לוח ראשי</a>
+        <a class="btn btn-dark" href="admin.html">ניהול הלוח</a>
+        <button class="btn-red" id="logoutBtn" type="button">התנתק</button>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="status" id="status">טוען נתונים...</div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="n" id="totalCount">0</div>
+          <div class="t">סה״כ חברים</div>
+        </div>
+
+        <div class="stat">
+          <div class="n" id="pendingCount">0</div>
+          <div class="t">ממתינים</div>
+        </div>
+
+        <div class="stat">
+          <div class="n" id="approvedCount">0</div>
+          <div class="t">מאושרים</div>
+        </div>
+
+        <div class="stat">
+          <div class="n" id="suspendedCount">0</div>
+          <div class="t">מושעים</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="חיפוש לפי שם, אימייל, בית כנסת או טלפון">
+        <select id="statusFilter">
+          <option value="">כל הסטטוסים</option>
+          <option value="pending">ממתין</option>
+          <option value="approved">מאושר</option>
+          <option value="suspended">מושעה</option>
+          <option value="rejected">נדחה</option>
+        </select>
+        <select id="roleFilter">
+          <option value="">כל התפקידים</option>
+          <option value="member">חבר</option>
+          <option value="rabbi">רב</option>
+          <option value="admin">מנהל</option>
+        </select>
+        <button class="btn-blue" id="refreshBtn" type="button">רענן</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>שם</th>
+              <th>אימייל</th>
+              <th>טלפון</th>
+              <th>בית כנסת</th>
+              <th>עיר</th>
+              <th>תפקיד</th>
+              <th>סטטוס</th>
+              <th>נרשם</th>
+              <th>פעולות</th>
+            </tr>
+          </thead>
+          <tbody id="membersBody"></tbody>
+        </table>
+
+        <div class="empty" id="emptyState">אין רשומות להצגה</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById("status");
+    const membersBody = document.getElementById("membersBody");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const roleFilter = document.getElementById("roleFilter");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let allMembers = [];
+
+    function setStatus(text, type="normal"){
+      statusEl.textContent = text;
+
+      if(type === "ok"){
+        statusEl.style.background = "#e8fff2";
+        statusEl.style.borderColor = "#57a67c";
+        statusEl.style.color = "#155936";
+      }else if(type === "bad"){
+        statusEl.style.background = "#fff0f0";
+        statusEl.style.borderColor = "#c56b6b";
+        statusEl.style.color = "#7d2020";
+      }else{
+        statusEl.style.background = "#fffdf4";
+        statusEl.style.borderColor = "#d2b15d";
+        statusEl.style.color = "#283661";
+      }
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function statusLabel(status){
+      const map = {
+        pending:"ממתין",
+        approved:"מאושר",
+        suspended:"מושעה",
+        rejected:"נדחה"
+      };
+      return map[status] || status || "—";
+    }
+
+    function roleLabel(role){
+      const map = {
+        member:"חבר",
+        rabbi:"רב",
+        admin:"מנהל"
+      };
+      return map[role] || role || "—";
+    }
+
+    function formatDate(value){
+      if(!value) return "—";
+      const d = new Date(value);
+      if(Number.isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("he-IL");
+    }
+
+    async function requireLogin(){
+      const { data, error } = await sb.auth.getSession();
+
+      if(error || !data.session){
+        location.href = "login.html";
+        return false;
+      }
+
+      return true;
+    }
+
+    async function loadMembers(){
+      setStatus("טוען חברים...");
+
+      try{
+        const { data, error } = await sb
+          .from("members")
+          .select("*")
+          .order("created_at",{ascending:false});
+
+        if(error) throw error;
+
+        allMembers = data || [];
+        renderMembers();
+        setStatus("הנתונים נטענו בהצלחה", "ok");
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה בטעינת החברים: " + (err.message || err), "bad");
+        allMembers = [];
+        renderMembers();
+      }
+    }
+
+    function renderMembers(){
+      const search = searchInput.value.trim().toLowerCase();
+      const wantedStatus = statusFilter.value;
+      const wantedRole = roleFilter.value;
+
+      const filtered = allMembers.filter(m=>{
+        const haystack = [
+          m.first_name,
+          m.last_name,
+          m.email,
+          m.phone,
+          m.synagogue_name,
+          m.city
+        ].join(" ").toLowerCase();
+
+        const matchSearch = !search || haystack.includes(search);
+        const matchStatus = !wantedStatus || m.status === wantedStatus;
+        const matchRole = !wantedRole || m.requested_role === wantedRole;
+
+        return matchSearch && matchStatus && matchRole;
+      });
+
+      document.getElementById("totalCount").textContent = allMembers.length;
+      document.getElementById("pendingCount").textContent =
+        allMembers.filter(x=>x.status==="pending").length;
+      document.getElementById("approvedCount").textContent =
+        allMembers.filter(x=>x.status==="approved").length;
+      document.getElementById("suspendedCount").textContent =
+        allMembers.filter(x=>x.status==="suspended").length;
+
+      membersBody.innerHTML = "";
+
+      if(filtered.length === 0){
+        emptyState.style.display = "block";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      for(const m of filtered){
+        const tr = document.createElement("tr");
+
+        const fullName = `${m.first_name || ""} ${m.last_name || ""}`.trim() || "—";
+        const currentStatus = m.status || "pending";
+
+        tr.innerHTML = `
+          <td>${escapeHtml(fullName)}</td>
+          <td dir="ltr">${escapeHtml(m.email || "—")}</td>
+          <td dir="ltr">${escapeHtml(m.phone || "—")}</td>
+          <td>${escapeHtml(m.synagogue_name || "—")}</td>
+          <td>${escapeHtml(m.city || "—")}</td>
+          <td>${escapeHtml(roleLabel(m.requested_role))}</td>
+          <td><span class="badge ${escapeHtml(currentStatus)}">${escapeHtml(statusLabel(currentStatus))}</span></td>
+          <td>${escapeHtml(formatDate(m.created_at))}</td>
+          <td>
+            <div class="row-actions">
+              <button class="btn-green" data-action="approve" data-id="${escapeHtml(m.id)}">אשר</button>
+              <button class="btn-gray" data-action="suspend" data-id="${escapeHtml(m.id)}">השעיה</button>
+              <button class="btn-red" data-action="reject" data-id="${escapeHtml(m.id)}">דחה</button>
+              <button class="btn-red" data-action="delete" data-id="${escapeHtml(m.id)}">מחק</button>
+            </div>
+          </td>
+        `;
+
+        membersBody.appendChild(tr);
+      }
+    }
+
+    async function updateMemberStatus(id, status){
+      try{
+        setStatus("מעדכן חבר...");
+
+        const payload = {
+          status,
+          approved: status === "approved"
+        };
+
+        if(status === "approved"){
+          payload.approved_at = new Date().toISOString();
+        }
+
+        const { error } = await sb
+          .from("members")
+          .update(payload)
+          .eq("id", id);
+
+        if(error) throw error;
+
+        setStatus("החבר עודכן בהצלחה", "ok");
+        await loadMembers();
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה בעדכון: " + (err.message || err), "bad");
+      }
+    }
+
+    async function deleteMember(id){
+      const ok = confirm("למחוק את הרשומה הזאת?");
+      if(!ok) return;
+
+      try{
+        setStatus("מוחק רשומה...");
+
+        const { error } = await sb
+          .from("members")
+          .delete()
+          .eq("id", id);
+
+        if(error) throw error;
+
+        setStatus("הרשומה נמחקה", "ok");
+        await loadMembers();
+      }catch(err){
+        console.error(err);
+        setStatus("שגיאה במחיקה: " + (err.message || err), "bad");
+      }
+    }
+
+    membersBody.addEventListener("click", async (event)=>{
+      const btn = event.target.closest("button[data-action]");
+      if(!btn) return;
+
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if(action === "approve"){
+        await updateMemberStatus(id,"approved");
+      }else if(action === "suspend"){
+        await updateMemberStatus(id,"suspended");
+      }else if(action === "reject"){
+        await updateMemberStatus(id,"rejected");
+      }else if(action === "delete"){
+        await deleteMember(id);
+      }
+    });
+
+    searchInput.addEventListener("input",renderMembers);
+    statusFilter.addEventListener("change",renderMembers);
+    roleFilter.addEventListener("change",renderMembers);
+    refreshBtn.addEventListener("click",loadMembers);
+
+    logoutBtn.addEventListener("click",async()=>{
+      try{
+        await sb.auth.signOut();
+      }catch(e){
+        console.warn(e);
+      }
+      location.href = "login.html";
+    });
+
+    (async()=>{
+      const ok = await requireLogin();
+      if(!ok) return;
+      await loadMembers();
+    })();
+  </script>
+</body>
+</html>

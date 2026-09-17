@@ -1,0 +1,241 @@
+-- Synagogue Message Board - Supabase setup
+-- Run this in Supabase SQL Editor once.
+
+create extension if not exists pgcrypto;
+
+-- =========================
+-- MEMBERS
+-- =========================
+create table if not exists public.members (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid unique references auth.users(id) on delete cascade,
+  first_name text,
+  last_name text,
+  email text,
+  phone text,
+  synagogue_name text,
+  street_address text,
+  city text,
+  state text,
+  zip_code text,
+  country text default 'United States',
+  referred_by text,
+  requested_role text default 'member'
+    check (requested_role in ('member','rabbi','admin')),
+  notes text,
+  status text default 'pending'
+    check (status in ('pending','approved','suspended','rejected')),
+  approved boolean default false,
+  approved_at timestamptz,
+  subscription_status text default 'inactive',
+  trial_ends_at timestamptz,
+  is_master_admin boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists members_user_id_idx
+  on public.members(user_id);
+
+create index if not exists members_status_idx
+  on public.members(status);
+
+-- =========================
+-- BOARD SETTINGS
+-- =========================
+create table if not exists public.board_settings (
+  id bigint primary key default 1 check (id = 1),
+
+  synagogue_name text default 'בית הכנסת בית תורה',
+  rabbi_name text default 'ברוכים הבאים',
+
+  daily_title text default 'שיעור יומי',
+  main_message text default 'ברוכים הבאים לבית הכנסת',
+  lesson_title text default 'שיעור יומי',
+  lesson_text text default 'השיעור היומי יתעדכן אוטומטית ממערכת הניהול.',
+  ticker_text text default 'לעילוי נשמת • לרפואה שלמה • להצלחה ולברכה',
+  side_message text default 'נא לעדכן הודעות דרך מערכת הניהול',
+
+  shacharit text default '07:00',
+  mincha text default '18:30',
+  maariv text default '19:15',
+
+  candle_lighting text default '—',
+  shabbat_end text default '—',
+  parasha text default '—',
+
+  alot text default '—',
+  misheyakir text default '—',
+  sunrise text default '—',
+  shema text default '—',
+  chatzot text default '—',
+  sunset text default '—',
+  tzeit text default '—',
+
+  prayer_scroll_speed integer default 28
+    check (prayer_scroll_speed between 4 and 100),
+
+  updated_at timestamptz default now()
+);
+
+insert into public.board_settings (id)
+values (1)
+on conflict (id) do nothing;
+
+-- =========================
+-- UPDATED-AT TRIGGER
+-- =========================
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists members_set_updated_at on public.members;
+create trigger members_set_updated_at
+before update on public.members
+for each row execute function public.set_updated_at();
+
+drop trigger if exists board_settings_set_updated_at on public.board_settings;
+create trigger board_settings_set_updated_at
+before update on public.board_settings
+for each row execute function public.set_updated_at();
+
+-- =========================
+-- HELPER FUNCTIONS
+-- =========================
+create or replace function public.is_master_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.members
+    where user_id = auth.uid()
+      and is_master_admin = true
+      and status = 'approved'
+  );
+$$;
+
+create or replace function public.can_manage_board()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.members
+    where user_id = auth.uid()
+      and status = 'approved'
+      and (
+        is_master_admin = true
+        or requested_role in ('admin','rabbi')
+      )
+  );
+$$;
+
+grant execute on function public.is_master_admin() to anon, authenticated;
+grant execute on function public.can_manage_board() to anon, authenticated;
+
+-- =========================
+-- RLS
+-- =========================
+alter table public.members enable row level security;
+alter table public.board_settings enable row level security;
+
+drop policy if exists "members_select_own" on public.members;
+create policy "members_select_own"
+on public.members
+for select
+to authenticated
+using (
+  user_id = auth.uid()
+  or public.is_master_admin()
+);
+
+drop policy if exists "members_insert_own" on public.members;
+create policy "members_insert_own"
+on public.members
+for insert
+to authenticated
+with check (
+  user_id = auth.uid()
+  and coalesce(is_master_admin,false) = false
+  and coalesce(status,'pending') = 'pending'
+  and coalesce(approved,false) = false
+);
+
+drop policy if exists "members_update_master" on public.members;
+create policy "members_update_master"
+on public.members
+for update
+to authenticated
+using (public.is_master_admin())
+with check (public.is_master_admin());
+
+drop policy if exists "members_delete_master" on public.members;
+create policy "members_delete_master"
+on public.members
+for delete
+to authenticated
+using (public.is_master_admin());
+
+drop policy if exists "board_public_read" on public.board_settings;
+create policy "board_public_read"
+on public.board_settings
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "board_admin_insert" on public.board_settings;
+create policy "board_admin_insert"
+on public.board_settings
+for insert
+to authenticated
+with check (public.can_manage_board());
+
+drop policy if exists "board_admin_update" on public.board_settings;
+create policy "board_admin_update"
+on public.board_settings
+for update
+to authenticated
+using (public.can_manage_board())
+with check (public.can_manage_board());
+
+-- =========================
+-- REALTIME
+-- =========================
+do $$
+begin
+  begin
+    alter publication supabase_realtime add table public.board_settings;
+  exception
+    when duplicate_object then null;
+  end;
+end $$;
+
+-- =========================
+-- IMPORTANT FIRST MASTER ADMIN
+-- =========================
+-- After you create your own account, replace YOUR_EMAIL below
+-- and run ONLY the UPDATE statement once.
+--
+-- update public.members
+-- set
+--   is_master_admin = true,
+--   requested_role = 'admin',
+--   status = 'approved',
+--   approved = true,
+--   approved_at = now()
+-- where lower(email) = lower('YOUR_EMAIL');

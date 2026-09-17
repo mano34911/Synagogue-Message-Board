@@ -1,0 +1,46 @@
+-- Synagogue Message Board
+-- PayPal / Subscription database update
+-- Run this in Supabase SQL Editor AFTER database-setup.txt
+
+alter table public.members
+  add column if not exists paypal_subscription_id text;
+
+alter table public.members
+  add column if not exists paypal_payer_id text;
+
+alter table public.members
+  add column if not exists subscription_started_at timestamptz;
+
+alter table public.members
+  add column if not exists subscription_cancelled_at timestamptz;
+
+create index if not exists members_paypal_subscription_id_idx
+  on public.members(paypal_subscription_id);
+
+-- Keep subscription fields consistent.
+update public.members
+set subscription_status = 'inactive'
+where subscription_status is null;
+
+-- Optional helper view for master admin subscription monitoring.
+create or replace view public.member_subscription_summary as
+select
+  id,
+  user_id,
+  first_name,
+  last_name,
+  email,
+  synagogue_name,
+  status as member_status,
+  subscription_status,
+  paypal_subscription_id,
+  trial_ends_at,
+  subscription_started_at,
+  subscription_cancelled_at,
+  created_at,
+  updated_at
+from public.members;
+
+-- Restrict access to the view through the underlying RLS-protected table.
+revoke all on public.member_subscription_summary from anon;
+grant select on public.member_subscription_summary to authenticated;

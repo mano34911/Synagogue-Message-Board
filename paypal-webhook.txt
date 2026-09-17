@@ -1,0 +1,288 @@
+// Supabase Edge Function
+// Function name: paypal-webhook
+//
+// Save this as:
+// supabase/functions/paypal-webhook/index.ts
+//
+// Purpose:
+// Receives PayPal webhook events and updates the member subscription status.
+//
+// Required Supabase secrets:
+// SUPABASE_URL
+// SUPABASE_SERVICE_ROLE_KEY
+// PAYPAL_CLIENT_ID
+// PAYPAL_CLIENT_SECRET
+// PAYPAL_WEBHOOK_ID
+// PAYPAL_BASE_URL
+//
+// PAYPAL_BASE_URL:
+// Sandbox: https://api-m.sandbox.paypal.com
+// Live:    https://api-m.paypal.com
+
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, paypal-auth-algo, paypal-cert-url, paypal-transmission-id, paypal-transmission-sig, paypal-transmission-time",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+async function getPayPalAccessToken() {
+  const clientId = Deno.env.get("PAYPAL_CLIENT_ID");
+  const clientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET");
+  const baseUrl =
+    Deno.env.get("PAYPAL_BASE_URL") ||
+    "https://api-m.sandbox.paypal.com";
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing PayPal credentials.");
+  }
+
+  const auth = btoa(`${clientId}:${clientSecret}`);
+
+  const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data?.error_description ||
+        data?.error ||
+        "Unable to obtain PayPal access token."
+    );
+  }
+
+  return {
+    accessToken: data.access_token as string,
+    baseUrl,
+  };
+}
+
+async function verifyWebhook(
+  req: Request,
+  eventBody: unknown
+) {
+  const webhookId = Deno.env.get("PAYPAL_WEBHOOK_ID");
+
+  if (!webhookId) {
+    throw new Error("Missing PAYPAL_WEBHOOK_ID.");
+  }
+
+  const transmissionId =
+    req.headers.get("paypal-transmission-id");
+  const transmissionTime =
+    req.headers.get("paypal-transmission-time");
+  const certUrl =
+    req.headers.get("paypal-cert-url");
+  const authAlgo =
+    req.headers.get("paypal-auth-algo");
+  const transmissionSig =
+    req.headers.get("paypal-transmission-sig");
+
+  if (
+    !transmissionId ||
+    !transmissionTime ||
+    !certUrl ||
+    !authAlgo ||
+    !transmissionSig
+  ) {
+    throw new Error("Missing PayPal verification headers.");
+  }
+
+  const { accessToken, baseUrl } =
+    await getPayPalAccessToken();
+
+  const response = await fetch(
+    `${baseUrl}/v1/notifications/verify-webhook-signature`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth_algo: authAlgo,
+        cert_url: certUrl,
+        transmission_id: transmissionId,
+        transmission_sig: transmissionSig,
+        transmission_time: transmissionTime,
+        webhook_id: webhookId,
+        webhook_event: eventBody,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ||
+        "PayPal webhook verification request failed."
+    );
+  }
+
+  return data?.verification_status === "SUCCESS";
+}
+
+function getSubscriptionStatus(eventType: string) {
+  const map: Record<string, string> = {
+    "BILLING.SUBSCRIPTION.CREATED": "created",
+    "BILLING.SUBSCRIPTION.ACTIVATED": "active",
+    "BILLING.SUBSCRIPTION.UPDATED": "active",
+    "BILLING.SUBSCRIPTION.SUSPENDED": "suspended",
+    "BILLING.SUBSCRIPTION.CANCELLED": "cancelled",
+    "BILLING.SUBSCRIPTION.EXPIRED": "expired",
+    "PAYMENT.SALE.COMPLETED": "active",
+    "PAYMENT.SALE.DENIED": "payment_failed",
+    "PAYMENT.SALE.REFUNDED": "refunded",
+  };
+
+  return map[eventType] || null;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  if (req.method !== "POST") {
+    return jsonResponse({ error: "Method not allowed." }, 405);
+  }
+
+  try {
+    const rawBody = await req.text();
+    const eventBody = JSON.parse(rawBody);
+
+    const verified = await verifyWebhook(req, eventBody);
+
+    if (!verified) {
+      return jsonResponse(
+        { error: "Invalid PayPal webhook signature." },
+        400
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey =
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error("Missing Supabase service credentials.");
+    }
+
+    const sb = createClient(
+      supabaseUrl,
+      serviceRoleKey
+    );
+
+    const eventType = eventBody?.event_type || "";
+    const resource = eventBody?.resource || {};
+    const subscriptionStatus =
+      getSubscriptionStatus(eventType);
+
+    if (!subscriptionStatus) {
+      return jsonResponse({
+        success: true,
+        ignored: true,
+        event_type: eventType,
+      });
+    }
+
+    const customId =
+      resource?.custom_id ||
+      resource?.supplementary_data?.related_ids?.subscription_id ||
+      null;
+
+    const subscriptionId =
+      resource?.id ||
+      resource?.billing_agreement_id ||
+      resource?.supplementary_data?.related_ids?.subscription_id ||
+      null;
+
+    if (!customId && !subscriptionId) {
+      return jsonResponse({
+        success: true,
+        ignored: true,
+        reason: "No member/user identifier found.",
+      });
+    }
+
+    const updatePayload: Record<string, unknown> = {
+      subscription_status: subscriptionStatus,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (subscriptionId) {
+      updatePayload.paypal_subscription_id =
+        subscriptionId;
+    }
+
+    if (
+      subscriptionStatus === "active" ||
+      subscriptionStatus === "created"
+    ) {
+      updatePayload.trial_ends_at =
+        new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString();
+    }
+
+    let query = sb
+      .from("members")
+      .update(updatePayload);
+
+    if (customId) {
+      query = query.or(
+        `id.eq.${customId},user_id.eq.${customId}`
+      );
+    } else if (subscriptionId) {
+      query = query.eq(
+        "paypal_subscription_id",
+        subscriptionId
+      );
+    }
+
+    const { error } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    return jsonResponse({
+      success: true,
+      event_type: eventType,
+      subscription_status: subscriptionStatus,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return jsonResponse(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unexpected server error.",
+      },
+      500
+    );
+  }
+});
