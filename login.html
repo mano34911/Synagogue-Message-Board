@@ -4,209 +4,334 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="google" content="notranslate">
-  <title>Synagogue Message Board - Login</title>
+  <title>Synagogue Login</title>
 
   <style>
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+
+    :root{
+      --navy:#071a38;
+      --navy2:#0d2e63;
+      --gold:#d8ad46;
+      --gold2:#f5da84;
+      --cream:#fff8e8;
+      --text:#ffffff;
+      --muted:#cfd8eb;
+      --danger:#ffb4b4;
+      --success:#b9f7c7;
+    }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial,Helvetica,sans-serif;
+      background:
+        radial-gradient(circle at top,#194f91 0%,#0a244d 36%,#020817 80%);
+      color:var(--text);
+    }
+
     body{
       min-height:100vh;
       display:grid;
       place-items:center;
       padding:24px;
-      color:#fff;
-      background:
-        radial-gradient(circle at top,#173f7b 0,#081c3d 42%,#020711 100%);
     }
+
     .card{
-      width:min(560px,96vw);
-      background:linear-gradient(180deg,#0b2c5e,#061a3a);
-      border:3px solid #d4aa42;
+      width:min(520px,96vw);
+      background:linear-gradient(180deg,rgba(13,46,99,.98),rgba(5,23,53,.98));
+      border:3px solid var(--gold);
       border-radius:24px;
+      box-shadow:
+        0 22px 70px rgba(0,0,0,.5),
+        inset 0 0 0 2px rgba(255,245,190,.12);
       padding:28px;
-      box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,238,169,.15);
     }
+
+    .logo{
+      width:72px;
+      height:72px;
+      margin:0 auto 14px;
+      border:2px solid var(--gold2);
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:38px;
+      background:#061a3b;
+      box-shadow:0 0 24px rgba(245,218,132,.18);
+    }
+
     h1{
-      margin:0 0 8px;
+      margin:0;
       text-align:center;
-      color:#f4d678;
-      font-size:clamp(28px,5vw,40px);
+      color:var(--gold2);
+      font-size:30px;
     }
-    .sub{
-      margin:0 0 24px;
+
+    .subtitle{
+      margin:8px 0 24px;
       text-align:center;
-      color:#d8e1f0;
-      line-height:1.5;
+      color:var(--muted);
+      line-height:1.45;
     }
+
     label{
       display:block;
       margin:14px 0 7px;
       font-weight:700;
-      color:#f5e7b8;
+      color:#f8e7ad;
     }
+
     input{
       width:100%;
       padding:14px 15px;
-      border:1px solid #7890b7;
       border-radius:12px;
-      background:#fff;
-      color:#111;
-      font-size:17px;
+      border:1px solid rgba(255,255,255,.22);
+      background:#071a38;
+      color:#fff;
       outline:none;
+      font-size:16px;
     }
+
     input:focus{
-      border-color:#f3cd63;
-      box-shadow:0 0 0 3px rgba(243,205,99,.18);
+      border-color:var(--gold2);
+      box-shadow:0 0 0 3px rgba(245,218,132,.12);
     }
+
+    .password-wrap{
+      position:relative;
+    }
+
+    .password-wrap input{
+      padding-right:76px;
+    }
+
+    .show-btn{
+      position:absolute;
+      right:7px;
+      top:50%;
+      transform:translateY(-50%);
+      border:0;
+      background:transparent;
+      color:var(--gold2);
+      font-weight:700;
+      cursor:pointer;
+      padding:8px;
+    }
+
     .btn{
       width:100%;
       border:0;
-      border-radius:12px;
+      border-radius:13px;
       padding:14px 16px;
-      margin-top:16px;
       font-size:17px;
       font-weight:800;
       cursor:pointer;
+      margin-top:15px;
     }
-    .primary{
-      background:linear-gradient(180deg,#f5d979,#d6a632);
-      color:#17213b;
+
+    .btn-primary{
+      color:#07152c;
+      background:linear-gradient(180deg,#f5da84,#d8ad46);
     }
-    .secondary{
-      background:#174a8d;
+
+    .btn-secondary{
       color:#fff;
-      border:1px solid #6e9bd2;
+      background:#13366f;
+      border:1px solid rgba(255,255,255,.18);
     }
-    .green{
-      background:#167449;
-      color:#fff;
-      border:1px solid #46a478;
+
+    .btn-register{
+      color:#07152c;
+      background:#fff4cd;
+      border:1px solid var(--gold);
     }
-    .outline{
+
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .link-btn{
+      display:block;
+      width:100%;
+      border:0;
       background:transparent;
-      color:#f4d678;
-      border:1px solid #d4aa42;
+      color:#f6d469;
+      text-decoration:underline;
+      cursor:pointer;
+      margin-top:15px;
+      font-size:15px;
     }
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:4px;
-    }
+
     .message{
       display:none;
-      margin-top:16px;
+      margin-top:17px;
       padding:12px 14px;
-      border-radius:12px;
+      border-radius:11px;
       line-height:1.4;
-      text-align:center;
+      word-break:break-word;
     }
-    .message.ok{
-      display:block;
-      background:#123f2d;
-      border:1px solid #3d9a6f;
-      color:#d9ffec;
-    }
+
     .message.error{
       display:block;
-      background:#501f28;
-      border:1px solid #b95d70;
-      color:#ffe4e9;
+      color:var(--danger);
+      background:rgba(130,0,0,.25);
+      border:1px solid rgba(255,180,180,.35);
     }
+
+    .message.success{
+      display:block;
+      color:var(--success);
+      background:rgba(0,100,35,.24);
+      border:1px solid rgba(185,247,199,.35);
+    }
+
     .small{
-      margin-top:18px;
-      color:#aebbd1;
-      text-align:center;
       font-size:13px;
-      line-height:1.5;
+      color:var(--muted);
+      text-align:center;
+      margin-top:18px;
+      line-height:1.45;
     }
-    @media(max-width:560px){
-      .card{padding:22px 18px}
-      .row{grid-template-columns:1fr}
+
+    .hidden{
+      display:none !important;
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.13);
+      margin:20px 0 4px;
     }
   </style>
 </head>
 
 <body>
   <main class="card">
-    <h1>Synagogue Login</h1>
-    <p class="sub">Sign in to manage your synagogue message board.</p>
+    <div class="logo">✡</div>
 
-    <form id="loginForm" autocomplete="on">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        inputmode="email"
-        autocomplete="email"
-        placeholder="you@example.com"
-        required
-      >
+    <section id="loginSection">
+      <h1>Synagogue Admin Login</h1>
+      <p class="subtitle">Sign in to manage your synagogue message board.</p>
 
-      <label for="password">Password</label>
-      <input
-        id="password"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Password"
-        required
-      >
+      <form id="loginForm" novalidate>
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="username"
+          placeholder="you@example.com"
+          required
+        >
 
-      <button id="loginBtn" class="btn primary" type="submit">
-        Sign In
-      </button>
-    </form>
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Your password"
+            required
+          >
+          <button type="button" class="show-btn" id="togglePassword">Show</button>
+        </div>
 
-    <button id="resetBtn" class="btn secondary" type="button">
-      Forgot / Reset Password
-    </button>
+        <button class="btn btn-primary" id="loginBtn" type="submit">
+          Sign In
+        </button>
 
-    <div class="row">
-      <button id="registerSynagogueBtn" class="btn green" type="button">
-        Register Synagogue
-      </button>
+        <button class="link-btn" id="forgotBtn" type="button">
+          Forgot password?
+        </button>
 
-      <button id="registerMemberBtn" class="btn green" type="button">
-        Register Member
-      </button>
-    </div>
+        <div class="divider"></div>
 
-    <button id="masterLoginBtn" class="btn outline" type="button">
-      Master Admin Login
-    </button>
+        <button class="btn btn-register" id="registerBtn" type="button">
+          Register Your Synagogue
+        </button>
+      </form>
+    </section>
+
+    <section id="recoverySection" class="hidden">
+      <h1>Choose New Password</h1>
+      <p class="subtitle">Enter your new password below.</p>
+
+      <form id="recoveryForm" novalidate>
+        <label for="newPassword">New Password</label>
+        <div class="password-wrap">
+          <input
+            id="newPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            placeholder="At least 6 characters"
+            required
+          >
+          <button type="button" class="show-btn" id="toggleNewPassword">Show</button>
+        </div>
+
+        <label for="confirmPassword">Confirm New Password</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          autocomplete="new-password"
+          minlength="6"
+          placeholder="Type it again"
+          required
+        >
+
+        <button class="btn btn-primary" id="savePasswordBtn" type="submit">
+          Save New Password
+        </button>
+      </form>
+    </section>
 
     <div id="message" class="message"></div>
 
-    <div class="small">
+    <p class="small">
       Synagogue Message Board
-    </div>
+    </p>
   </main>
 
-  <!-- Supabase library MUST load first -->
+  <!-- Supabase library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Your shared Supabase configuration MUST load second -->
+  <!-- Your shared Supabase configuration -->
   <script src="supabase-config.js"></script>
 
   <script>
-    (function () {
+    (() => {
       "use strict";
 
+      const loginSection = document.getElementById("loginSection");
+      const recoverySection = document.getElementById("recoverySection");
       const loginForm = document.getElementById("loginForm");
-      const loginBtn = document.getElementById("loginBtn");
-      const resetBtn = document.getElementById("resetBtn");
-      const registerSynagogueBtn = document.getElementById("registerSynagogueBtn");
-      const registerMemberBtn = document.getElementById("registerMemberBtn");
-      const masterLoginBtn = document.getElementById("masterLoginBtn");
+      const recoveryForm = document.getElementById("recoveryForm");
+
       const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
+      const newPasswordInput = document.getElementById("newPassword");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+
+      const loginBtn = document.getElementById("loginBtn");
+      const forgotBtn = document.getElementById("forgotBtn");
+      const registerBtn = document.getElementById("registerBtn");
+      const savePasswordBtn = document.getElementById("savePasswordBtn");
+
+      const togglePassword = document.getElementById("togglePassword");
+      const toggleNewPassword = document.getElementById("toggleNewPassword");
+
       const messageBox = document.getElementById("message");
 
-      function showMessage(text, type) {
+      let supabaseClient = null;
+
+      function showMessage(text, type = "error") {
         messageBox.textContent = text;
-        messageBox.className = "message " + (type || "error");
+        messageBox.className = "message " + type;
       }
 
       function clearMessage() {
@@ -214,40 +339,76 @@
         messageBox.className = "message";
       }
 
+      function setBusy(button, busy, busyText, normalText) {
+        button.disabled = busy;
+        button.textContent = busy ? busyText : normalText;
+      }
+
+      function showRecoveryMode() {
+        clearMessage();
+        loginSection.classList.add("hidden");
+        recoverySection.classList.remove("hidden");
+      }
+
+      function showLoginMode() {
+        recoverySection.classList.add("hidden");
+        loginSection.classList.remove("hidden");
+      }
+
       function getClient() {
-        if (typeof window.getSupabase !== "function") {
-          throw new Error(
-            "supabase-config.js did not load. Make sure it is in the same GitHub folder as login.html."
+        if (supabaseClient) return supabaseClient;
+
+        if (typeof window.getSupabase === "function") {
+          supabaseClient = window.getSupabase();
+          return supabaseClient;
+        }
+
+        if (
+          window.supabase &&
+          window.APP_CONFIG &&
+          window.APP_CONFIG.SUPABASE_URL &&
+          window.APP_CONFIG.SUPABASE_PUBLISHABLE_KEY
+        ) {
+          supabaseClient = window.supabase.createClient(
+            window.APP_CONFIG.SUPABASE_URL,
+            window.APP_CONFIG.SUPABASE_PUBLISHABLE_KEY,
+            {
+              auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+              }
+            }
           );
+          return supabaseClient;
         }
 
-        return window.getSupabase();
+        throw new Error(
+          "Supabase configuration did not load. Make sure supabase-config.js is in the same GitHub folder as login.html."
+        );
       }
 
-      async function redirectIfAlreadyLoggedIn() {
-        try {
-          const supabaseClient = getClient();
-
-          const {
-            data: { session },
-            error
-          } = await supabaseClient.auth.getSession();
-
-          if (error) {
-            console.warn("Session check:", error.message);
-            return;
-          }
-
-          if (session) {
-            window.location.replace("admin.html");
-          }
-        } catch (error) {
-          console.error(error);
-          showMessage(error.message, "error");
-        }
+      function redirectToAdmin() {
+        window.location.replace("admin.html");
       }
 
-      loginForm.addEventListener("submit", async function (event) {
+      togglePassword.addEventListener("click", () => {
+        const hidden = passwordInput.type === "password";
+        passwordInput.type = hidden ? "text" : "password";
+        togglePassword.textContent = hidden ? "Hide" : "Show";
+      });
+
+      toggleNewPassword.addEventListener("click", () => {
+        const hidden = newPasswordInput.type === "password";
+        newPasswordInput.type = hidden ? "text" : "password";
+        toggleNewPassword.textContent = hidden ? "Hide" : "Show";
+      });
+
+      registerBtn.addEventListener("click", () => {
+        window.location.href = "register.html";
+      });
+
+      loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         clearMessage();
 
@@ -255,101 +416,188 @@
         const password = passwordInput.value;
 
         if (!email || !password) {
-          showMessage("Please enter your email and password.", "error");
+          showMessage("Please enter your email and password.");
           return;
         }
 
-        loginBtn.disabled = true;
-        loginBtn.textContent = "Signing In...";
+        setBusy(loginBtn, true, "Signing In...", "Sign In");
 
         try {
-          const supabaseClient = getClient();
+          const client = getClient();
 
-          const { data, error } = await supabaseClient.auth.signInWithPassword({
+          const { data, error } = await client.auth.signInWithPassword({
             email,
             password
           });
 
-          if (error) {
-            throw error;
-          }
+          if (error) throw error;
 
           if (!data || !data.session) {
-            throw new Error("Login did not create a session. Please try again.");
+            throw new Error("Login succeeded but no session was created.");
           }
 
-          showMessage("Login successful. Opening admin page...", "ok");
+          showMessage("Login successful. Opening admin page...", "success");
 
-          setTimeout(function () {
-            window.location.href = "admin.html";
-          }, 400);
+          setTimeout(() => {
+            redirectToAdmin();
+          }, 450);
 
         } catch (error) {
           console.error("Login error:", error);
-          showMessage(error.message || "Unable to sign in.", "error");
-          loginBtn.disabled = false;
-          loginBtn.textContent = "Sign In";
+
+          let text = error?.message || "Unable to sign in.";
+
+          if (/invalid login credentials/i.test(text)) {
+            text = "Incorrect email or password.";
+          } else if (/email not confirmed/i.test(text)) {
+            text = "Please confirm your email before signing in.";
+          }
+
+          showMessage(text);
+        } finally {
+          setBusy(loginBtn, false, "Signing In...", "Sign In");
         }
       });
 
-      resetBtn.addEventListener("click", async function () {
+      forgotBtn.addEventListener("click", async () => {
         clearMessage();
 
         const email = emailInput.value.trim();
 
         if (!email) {
-          showMessage(
-            "Enter your email address first, then press Reset Password.",
-            "error"
-          );
+          showMessage("Enter your email address first, then tap Forgot password.");
           emailInput.focus();
           return;
         }
 
-        resetBtn.disabled = true;
-        resetBtn.textContent = "Sending Reset Email...";
+        forgotBtn.disabled = true;
+        forgotBtn.textContent = "Sending reset email...";
 
         try {
-          const supabaseClient = getClient();
+          const client = getClient();
 
-          const redirectTo = new URL("reset-password.html", window.location.href).href;
+          const redirectTo =
+            window.location.origin +
+            window.location.pathname;
 
-          const { error } = await supabaseClient.auth.resetPasswordForEmail(
-            email,
-            { redirectTo }
-          );
+          const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo
+          });
 
-          if (error) {
-            throw error;
-          }
+          if (error) throw error;
 
           showMessage(
-            "Password reset email sent. Check your email.",
-            "ok"
+            "Password reset email sent. Open the email and follow the link. You will return here to choose a new password.",
+            "success"
           );
 
         } catch (error) {
           console.error("Password reset error:", error);
-          showMessage(error.message || "Unable to send reset email.", "error");
+          showMessage(error?.message || "Could not send password reset email.");
         } finally {
-          resetBtn.disabled = false;
-          resetBtn.textContent = "Forgot / Reset Password";
+          forgotBtn.disabled = false;
+          forgotBtn.textContent = "Forgot password?";
         }
       });
 
-      registerSynagogueBtn.addEventListener("click", function () {
-        window.location.href = "register.html";
+      recoveryForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearMessage();
+
+        const password = newPasswordInput.value;
+        const confirm = confirmPasswordInput.value;
+
+        if (password.length < 6) {
+          showMessage("Password must be at least 6 characters.");
+          return;
+        }
+
+        if (password !== confirm) {
+          showMessage("The two passwords do not match.");
+          return;
+        }
+
+        setBusy(
+          savePasswordBtn,
+          true,
+          "Saving...",
+          "Save New Password"
+        );
+
+        try {
+          const client = getClient();
+
+          const { error } = await client.auth.updateUser({
+            password
+          });
+
+          if (error) throw error;
+
+          showMessage(
+            "Password changed successfully. Opening admin page...",
+            "success"
+          );
+
+          setTimeout(() => {
+            redirectToAdmin();
+          }, 700);
+
+        } catch (error) {
+          console.error("Update password error:", error);
+          showMessage(error?.message || "Could not update password.");
+        } finally {
+          setBusy(
+            savePasswordBtn,
+            false,
+            "Saving...",
+            "Save New Password"
+          );
+        }
       });
 
-      registerMemberBtn.addEventListener("click", function () {
-        window.location.href = "member-register.html";
-      });
+      async function initialize() {
+        try {
+          const client = getClient();
 
-      masterLoginBtn.addEventListener("click", function () {
-        window.location.href = "master-login.html";
-      });
+          client.auth.onAuthStateChange((event) => {
+            if (event === "PASSWORD_RECOVERY") {
+              showRecoveryMode();
+            }
+          });
 
-      window.addEventListener("load", redirectIfAlreadyLoggedIn);
+          const hash = window.location.hash || "";
+          const query = window.location.search || "";
+
+          if (
+            hash.includes("type=recovery") ||
+            query.includes("type=recovery")
+          ) {
+            showRecoveryMode();
+            return;
+          }
+
+          const { data } = await client.auth.getSession();
+
+          if (data?.session) {
+            showMessage(
+              "You are already signed in. Opening admin page...",
+              "success"
+            );
+
+            setTimeout(() => {
+              redirectToAdmin();
+            }, 350);
+          } else {
+            showLoginMode();
+          }
+
+        } catch (error) {
+          console.error("Initialization error:", error);
+          showMessage(error?.message || "Unable to initialize login.");
+        }
+      }
+
+      initialize();
     })();
   </script>
 </body>
