@@ -1,115 +1,366 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<title>Master Admin Login</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Arial,"Noto Sans Hebrew",sans-serif;background:radial-gradient(circle at top,#143f7d,#06152d 50%,#020710);color:#fff;display:grid;place-items:center;padding:24px}
-.card{width:min(520px,96vw);background:linear-gradient(180deg,#0b2b5d,#061a3b);border:3px solid #d7a62d;border-radius:24px;box-shadow:0 20px 60px #0008,inset 0 0 0 2px #fff2a633;padding:28px}
-h1{color:#f6d469;text-align:center;margin:0 0 8px}
-.muted{color:#d8dfef;font-size:14px;text-align:center;margin-bottom:18px}
-label{display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:14px}
-input{width:100%;padding:13px;border-radius:10px;border:1px solid #d7a62d;background:#fff;color:#111;font-size:16px}
-button{width:100%;border:0;border-radius:11px;padding:13px 18px;background:#d7a62d;color:#07152d;font-weight:900;font-size:16px;cursor:pointer}
-button:disabled{opacity:.6;cursor:not-allowed}
-.msg{min-height:24px;text-align:center;margin-top:14px;font-weight:800;white-space:pre-wrap}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="google" content="notranslate">
+  <title>Master Admin Login</title>
+
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+    body{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      color:#fff;
+      background:
+        radial-gradient(circle at top,#173f7b 0,#081c3d 42%,#020711 100%);
+    }
+    .card{
+      width:min(560px,96vw);
+      background:linear-gradient(180deg,#0b2c5e,#061a3a);
+      border:3px solid #d4aa42;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,238,169,.15);
+    }
+    h1{
+      margin:0 0 8px;
+      text-align:center;
+      color:#f4d678;
+      font-size:clamp(28px,5vw,40px);
+    }
+    .sub{
+      margin:0 0 24px;
+      text-align:center;
+      color:#d8e1f0;
+      line-height:1.5;
+    }
+    label{
+      display:block;
+      margin:14px 0 7px;
+      font-weight:700;
+      color:#f5e7b8;
+    }
+    input{
+      width:100%;
+      padding:14px 15px;
+      border:1px solid #7890b7;
+      border-radius:12px;
+      background:#fff;
+      color:#111;
+      font-size:17px;
+      outline:none;
+    }
+    input:focus{
+      border-color:#f3cd63;
+      box-shadow:0 0 0 3px rgba(243,205,99,.18);
+    }
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:12px;
+      padding:14px 16px;
+      margin-top:16px;
+      font-size:17px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .primary{
+      background:linear-gradient(180deg,#f5d979,#d6a632);
+      color:#17213b;
+    }
+    .secondary{
+      background:#174a8d;
+      color:#fff;
+      border:1px solid #6e9bd2;
+    }
+    .outline{
+      background:transparent;
+      color:#f4d678;
+      border:1px solid #d4aa42;
+    }
+    .message{
+      display:none;
+      margin-top:16px;
+      padding:12px 14px;
+      border-radius:12px;
+      text-align:center;
+      line-height:1.45;
+    }
+    .message.ok{
+      display:block;
+      background:#123f2d;
+      border:1px solid #3d9a6f;
+      color:#d9ffec;
+    }
+    .message.error{
+      display:block;
+      background:#501f28;
+      border:1px solid #b95d70;
+      color:#ffe4e9;
+    }
+    .small{
+      margin-top:18px;
+      color:#aebbd1;
+      text-align:center;
+      font-size:13px;
+      line-height:1.5;
+    }
+  </style>
 </head>
+
 <body>
-<div class="card">
-  <h1>👑 Master Admin Login</h1>
-  <div class="muted">Synagogue Message Board</div>
+  <main class="card">
+    <h1>Master Admin Login</h1>
+    <p class="sub">
+      Sign in with the Master Admin account to manage synagogue registrations and members.
+    </p>
 
-  <form id="loginForm">
-    <label>Email
-      <input id="email" type="email" autocomplete="username" required>
-    </label>
-    <label>Password
-      <input id="password" type="password" autocomplete="current-password" required>
-    </label>
-    <button id="btn" type="submit">MASTER ADMIN LOGIN</button>
-  </form>
+    <form id="masterLoginForm" autocomplete="on">
+      <label for="email">Master Admin Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="Master Admin email"
+        required
+      >
 
-  <div id="msg" class="msg"></div>
-</div>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Password"
+        required
+      >
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+      <button id="loginBtn" class="btn primary" type="submit">
+        Sign In as Master Admin
+      </button>
+    </form>
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: false,
-    storageKey: "synagogue-master-admin-auth"
-  }
-});
+    <button id="resetBtn" class="btn secondary" type="button">
+      Forgot / Reset Password
+    </button>
 
-const form = document.getElementById("loginForm");
-const btn = document.getElementById("btn");
-const msg = document.getElementById("msg");
+    <button id="regularLoginBtn" class="btn outline" type="button">
+      Back to Synagogue Login
+    </button>
 
-function show(text, good=false){
-  msg.textContent = text || "";
-  msg.style.color = good ? "#83ff9d" : "#ffd56b";
-}
+    <div id="message" class="message"></div>
 
-async function verifyMaster(user){
-  const { data, error } = await sb
-    .from("app_profiles")
-    .select("user_id,role,status")
-    .eq("user_id", user.id)
-    .maybeSingle();
+    <div class="small">
+      Synagogue Message Board — Master Administration
+    </div>
+  </main>
 
-  if (error) throw new Error("Master profile check failed: " + error.message);
-  if (!data) throw new Error("Login worked, but no app_profiles record was found.");
+  <!-- 1. Load Supabase library first -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  const role = String(data.role || "").toLowerCase();
-  const status = String(data.status || "").toLowerCase();
+  <!-- 2. Load shared Supabase configuration second -->
+  <script src="supabase-config.js"></script>
 
-  if (role !== "master_admin") {
-    throw new Error("This account is not marked as master_admin.");
-  }
+  <script>
+    (function () {
+      "use strict";
 
-  if (status !== "approved") {
-    throw new Error("Master admin account is not approved. Current status: " + (status || "unknown"));
-  }
+      const MASTER_ADMIN_EMAIL = "mano3491@gmail.com";
 
-  return data;
-}
+      const form = document.getElementById("masterLoginForm");
+      const loginBtn = document.getElementById("loginBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const regularLoginBtn = document.getElementById("regularLoginBtn");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const messageBox = document.getElementById("message");
 
-form.addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  btn.disabled = true;
-  btn.textContent = "SIGNING IN...";
-  show("Signing in...");
+      function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = "message " + (type || "error");
+      }
 
-  try {
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
+      function clearMessage() {
+        messageBox.textContent = "";
+        messageBox.className = "message";
+      }
 
-    await sb.auth.signOut({ scope: "local" });
+      function getClient() {
+        if (typeof window.getSupabase !== "function") {
+          throw new Error(
+            "supabase-config.js did not load. Make sure it is in the same GitHub folder as master-login.html."
+          );
+        }
 
-    const { data, error } = await sb.auth.signInWithPassword({email, password});
-    if (error) throw error;
-    if (!data?.user) throw new Error("Supabase did not return a user.");
+        return window.getSupabase();
+      }
 
-    await verifyMaster(data.user);
+      function isMasterAdmin(user) {
+        if (!user) return false;
 
-    show("Master admin login successful.", true);
-    window.location.replace("master-admin.html");
-  } catch (e) {
-    console.error(e);
-    show(e.message || "Login failed.");
-    btn.disabled = false;
-    btn.textContent = "MASTER ADMIN LOGIN";
-  }
-});
-</script>
+        const userEmail = String(user.email || "").trim().toLowerCase();
+        const metadataRole = String(
+          (user.user_metadata && user.user_metadata.role) ||
+          (user.app_metadata && user.app_metadata.role) ||
+          ""
+        ).trim().toLowerCase();
+
+        return (
+          userEmail === MASTER_ADMIN_EMAIL.toLowerCase() ||
+          metadataRole === "master_admin" ||
+          metadataRole === "master-admin" ||
+          metadataRole === "master"
+        );
+      }
+
+      async function redirectIfMasterAlreadyLoggedIn() {
+        try {
+          const sb = getClient();
+
+          const {
+            data: { session },
+            error
+          } = await sb.auth.getSession();
+
+          if (error) {
+            console.warn("Session check:", error.message);
+            return;
+          }
+
+          if (session && session.user && isMasterAdmin(session.user)) {
+            window.location.replace("master-admin.html");
+          }
+        } catch (error) {
+          console.error(error);
+          showMessage(error.message, "error");
+        }
+      }
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearMessage();
+
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          showMessage("Please enter the Master Admin email and password.", "error");
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Signing In...";
+
+        try {
+          const sb = getClient();
+
+          const { data, error } = await sb.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          if (!data || !data.session || !data.user) {
+            throw new Error("Login did not create a valid session.");
+          }
+
+          if (!isMasterAdmin(data.user)) {
+            await sb.auth.signOut();
+            throw new Error("This account is not authorized as Master Admin.");
+          }
+
+          showMessage(
+            "Master Admin login successful. Opening dashboard...",
+            "ok"
+          );
+
+          setTimeout(function () {
+            window.location.href = "master-admin.html";
+          }, 400);
+
+        } catch (error) {
+          console.error("Master Admin login error:", error);
+
+          showMessage(
+            error && error.message
+              ? error.message
+              : "Unable to sign in as Master Admin.",
+            "error"
+          );
+
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign In as Master Admin";
+        }
+      });
+
+      resetBtn.addEventListener("click", async function () {
+        clearMessage();
+
+        let email = emailInput.value.trim().toLowerCase();
+
+        if (!email) {
+          email = MASTER_ADMIN_EMAIL;
+          emailInput.value = email;
+        }
+
+        resetBtn.disabled = true;
+        resetBtn.textContent = "Sending Reset Email...";
+
+        try {
+          const sb = getClient();
+
+          const redirectTo = new URL(
+            "reset-password.html",
+            window.location.href
+          ).href;
+
+          const { error } = await sb.auth.resetPasswordForEmail(
+            email,
+            { redirectTo }
+          );
+
+          if (error) {
+            throw error;
+          }
+
+          showMessage(
+            "Password reset email sent. Check the Master Admin email inbox.",
+            "ok"
+          );
+
+        } catch (error) {
+          console.error("Password reset error:", error);
+
+          showMessage(
+            error && error.message
+              ? error.message
+              : "Unable to send password reset email.",
+            "error"
+          );
+        } finally {
+          resetBtn.disabled = false;
+          resetBtn.textContent = "Forgot / Reset Password";
+        }
+      });
+
+      regularLoginBtn.addEventListener("click", function () {
+        window.location.href = "login.html";
+      });
+
+      window.addEventListener("load", function () {
+        emailInput.value = MASTER_ADMIN_EMAIL;
+        redirectIfMasterAlreadyLoggedIn();
+      });
+    })();
+  </script>
 </body>
 </html>
