@@ -1,364 +1,356 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>כניסה למערכת</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="google" content="notranslate">
+  <title>Synagogue Message Board - Login</title>
 
   <style>
-    :root{
-      --navy:#0d1d4d;
-      --navy2:#12275f;
-      --gold:#d4a93e;
-      --gold2:#f4d77d;
-      --cream:#fff8df;
-      --green:#159447;
-      --red:#b42318;
-      --text:#211b12;
-    }
-
     *{box-sizing:border-box}
-
-    html,body{
-      margin:0;
-      min-height:100%;
-      background:var(--navy);
-      font-family:Arial,"Noto Sans Hebrew",sans-serif;
-      color:var(--text);
-    }
-
+    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
     body{
       min-height:100vh;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      padding:34px 16px 40px;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      color:#fff;
+      background:
+        radial-gradient(circle at top,#173f7b 0,#081c3d 42%,#020711 100%);
     }
-
     .card{
-      width:min(760px,100%);
-      background:var(--cream);
-      border:7px solid var(--gold);
-      border-radius:40px;
-      padding:42px 34px 34px;
-      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      width:min(560px,96vw);
+      background:linear-gradient(180deg,#0b2c5e,#061a3a);
+      border:3px solid #d4aa42;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,238,169,.15);
     }
-
     h1{
-      margin:0 0 22px;
+      margin:0 0 8px;
       text-align:center;
-      color:var(--navy);
-      font-size:clamp(38px,7vw,58px);
-      line-height:1.05;
-      font-weight:900;
+      color:#f4d678;
+      font-size:clamp(28px,5vw,40px);
     }
-
-    .subtitle{
+    .sub{
+      margin:0 0 24px;
       text-align:center;
-      font-size:clamp(20px,4vw,31px);
-      margin-bottom:34px;
+      color:#d8e1f0;
+      line-height:1.5;
     }
-
-    .field{
-      margin-bottom:23px;
-    }
-
     label{
       display:block;
-      font-size:clamp(20px,4vw,28px);
-      font-weight:800;
-      margin:0 0 8px;
+      margin:14px 0 7px;
+      font-weight:700;
+      color:#f5e7b8;
     }
-
     input{
       width:100%;
-      padding:19px 18px;
-      border:3px solid #d2ad4e;
-      border-radius:20px;
+      padding:14px 15px;
+      border:1px solid #7890b7;
+      border-radius:12px;
       background:#fff;
       color:#111;
-      font-size:clamp(20px,4vw,28px);
-      font-weight:700;
+      font-size:17px;
       outline:none;
-      direction:ltr;
-      text-align:left;
     }
-
     input:focus{
-      border-color:var(--navy2);
-      box-shadow:0 0 0 3px rgba(18,39,95,.12);
+      border-color:#f3cd63;
+      box-shadow:0 0 0 3px rgba(243,205,99,.18);
     }
-
     .btn{
       width:100%;
       border:0;
-      border-radius:19px;
-      padding:18px 16px;
-      font-size:clamp(18px,3.7vw,25px);
-      font-weight:900;
-      cursor:pointer;
-      margin-top:8px;
-    }
-
-    .btn-primary{
-      background:var(--navy2);
-      color:#fff;
-    }
-
-    .btn-reset{
-      background:#d7b24d;
-      color:#17130b;
-      margin-top:14px;
-    }
-
-    .bottom-row{
-      display:flex;
-      gap:14px;
-      margin-top:18px;
-    }
-
-    .bottom-row a{
-      flex:1;
-      text-decoration:none;
-      text-align:center;
-      padding:17px 10px;
-      border-radius:18px;
-      font-size:clamp(18px,3.6vw,24px);
-      font-weight:900;
-    }
-
-    .home{
-      background:var(--navy2);
-      color:#fff;
-    }
-
-    .register{
-      background:var(--green);
-      color:#fff;
-    }
-
-    .msg{
-      min-height:34px;
-      margin-top:12px;
-      text-align:center;
-      font-size:clamp(18px,3.8vw,24px);
+      border-radius:12px;
+      padding:14px 16px;
+      margin-top:16px;
+      font-size:17px;
       font-weight:800;
-      line-height:1.35;
+      cursor:pointer;
     }
-
-    .msg.error{color:var(--red)}
-    .msg.success{color:var(--green)}
-
-    .small{
-      margin-top:14px;
+    .primary{
+      background:linear-gradient(180deg,#f5d979,#d6a632);
+      color:#17213b;
+    }
+    .secondary{
+      background:#174a8d;
+      color:#fff;
+      border:1px solid #6e9bd2;
+    }
+    .green{
+      background:#167449;
+      color:#fff;
+      border:1px solid #46a478;
+    }
+    .outline{
+      background:transparent;
+      color:#f4d678;
+      border:1px solid #d4aa42;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:4px;
+    }
+    .message{
+      display:none;
+      margin-top:16px;
+      padding:12px 14px;
+      border-radius:12px;
+      line-height:1.4;
       text-align:center;
-      font-size:15px;
-      color:#615840;
     }
-
+    .message.ok{
+      display:block;
+      background:#123f2d;
+      border:1px solid #3d9a6f;
+      color:#d9ffec;
+    }
+    .message.error{
+      display:block;
+      background:#501f28;
+      border:1px solid #b95d70;
+      color:#ffe4e9;
+    }
+    .small{
+      margin-top:18px;
+      color:#aebbd1;
+      text-align:center;
+      font-size:13px;
+      line-height:1.5;
+    }
     @media(max-width:560px){
-      body{padding:34px 12px}
-      .card{
-        padding:34px 20px 28px;
-        border-width:6px;
-        border-radius:34px;
-      }
-      .bottom-row{gap:10px}
+      .card{padding:22px 18px}
+      .row{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-
   <main class="card">
-    <h1>🔐 כניסה למערכת</h1>
-    <div class="subtitle">Master Admin • Synagogue Owner • Member</div>
+    <h1>Synagogue Login</h1>
+    <p class="sub">Sign in to manage your synagogue message board.</p>
 
-    <form id="loginForm">
-      <div class="field">
-        <label for="email">אימייל</label>
-        <input id="email" type="email" autocomplete="email" required>
-      </div>
+    <form id="loginForm" autocomplete="on">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        required
+      >
 
-      <div class="field">
-        <label for="password">סיסמה</label>
-        <input id="password" type="password" autocomplete="current-password" required>
-      </div>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Password"
+        required
+      >
 
-      <button class="btn btn-primary" id="loginBtn" type="submit">LOGIN</button>
-      <button class="btn btn-reset" id="resetBtn" type="button">🔑 שכחתי סיסמה / RESET PASSWORD</button>
-
-      <div id="message" class="msg"></div>
+      <button id="loginBtn" class="btn primary" type="submit">
+        Sign In
+      </button>
     </form>
 
-    <div class="bottom-row">
-      <a class="register" href="register.html">REGISTER / הרשמה</a>
-      <a class="home" href="index.html">ללוח</a>
+    <button id="resetBtn" class="btn secondary" type="button">
+      Forgot / Reset Password
+    </button>
+
+    <div class="row">
+      <button id="registerSynagogueBtn" class="btn green" type="button">
+        Register Synagogue
+      </button>
+
+      <button id="registerMemberBtn" class="btn green" type="button">
+        Register Member
+      </button>
     </div>
 
+    <button id="masterLoginBtn" class="btn outline" type="button">
+      Master Admin Login
+    </button>
+
+    <div id="message" class="message"></div>
+
     <div class="small">
-      Password reset will be sent to the email address entered above.
+      Synagogue Message Board
     </div>
   </main>
 
-<script>
-const SUPABASE_URL = 'https://chcfhxkggbrlxaopnfum.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D';
+  <!-- Supabase library MUST load first -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- Your shared Supabase configuration MUST load second -->
+  <script src="supabase-config.js"></script>
 
-const form = document.getElementById('loginForm');
-const emailEl = document.getElementById('email');
-const passwordEl = document.getElementById('password');
-const loginBtn = document.getElementById('loginBtn');
-const resetBtn = document.getElementById('resetBtn');
-const message = document.getElementById('message');
+  <script>
+    (function () {
+      "use strict";
 
-function showMessage(text, type=''){
-  message.textContent = text || '';
-  message.className = 'msg' + (type ? ' ' + type : '');
-}
+      const loginForm = document.getElementById("loginForm");
+      const loginBtn = document.getElementById("loginBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const registerSynagogueBtn = document.getElementById("registerSynagogueBtn");
+      const registerMemberBtn = document.getElementById("registerMemberBtn");
+      const masterLoginBtn = document.getElementById("masterLoginBtn");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const messageBox = document.getElementById("message");
 
-function normalizeRole(role){
-  return String(role || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g,'_')
-    .replace(/-/g,'_');
-}
+      function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = "message " + (type || "error");
+      }
 
-async function getProfile(userId){
-  const { data, error } = await sb
-    .from('app_profiles')
-    .select('*')
-    .eq('id', userId)
-    .maybeSingle();
+      function clearMessage() {
+        messageBox.textContent = "";
+        messageBox.className = "message";
+      }
 
-  if(error) throw error;
-  return data;
-}
+      function getClient() {
+        if (typeof window.getSupabase !== "function") {
+          throw new Error(
+            "supabase-config.js did not load. Make sure it is in the same GitHub folder as login.html."
+          );
+        }
 
-function redirectForRole(profile){
-  const role = normalizeRole(profile?.role);
-  const status = String(profile?.status || '').trim().toLowerCase();
+        return window.getSupabase();
+      }
 
-  if(status && !['approved','active'].includes(status)){
-    throw new Error('Your account is not approved yet.');
-  }
+      async function redirectIfAlreadyLoggedIn() {
+        try {
+          const supabaseClient = getClient();
 
-  if(role === 'master_admin' || role === 'master'){
-    location.href = 'master-admin.html';
-    return;
-  }
+          const {
+            data: { session },
+            error
+          } = await supabaseClient.auth.getSession();
 
-  if(role === 'synagogue_owner' || role === 'synagogue_admin' || role === 'owner'){
-    location.href = 'synagogue-admin.html';
-    return;
-  }
+          if (error) {
+            console.warn("Session check:", error.message);
+            return;
+          }
 
-  if(role === 'member'){
-    location.href = 'member-portal.html';
-    return;
-  }
+          if (session) {
+            window.location.replace("admin.html");
+          }
+        } catch (error) {
+          console.error(error);
+          showMessage(error.message, "error");
+        }
+      }
 
-  throw new Error('Account role not recognized.');
-}
+      loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearMessage();
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  showMessage('');
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-  const email = emailEl.value.trim();
-  const password = passwordEl.value;
+        if (!email || !password) {
+          showMessage("Please enter your email and password.", "error");
+          return;
+        }
 
-  if(!email || !password){
-    showMessage('נא להזין אימייל וסיסמה.', 'error');
-    return;
-  }
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Signing In...";
 
-  loginBtn.disabled = true;
-  loginBtn.textContent = 'מתחבר...';
+        try {
+          const supabaseClient = getClient();
 
-  try{
-    const { data, error } = await sb.auth.signInWithPassword({
-      email,
-      password
-    });
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
 
-    if(error) throw error;
-    if(!data?.user) throw new Error('Login failed.');
+          if (error) {
+            throw error;
+          }
 
-    const profile = await getProfile(data.user.id);
+          if (!data || !data.session) {
+            throw new Error("Login did not create a session. Please try again.");
+          }
 
-    if(!profile){
-      await sb.auth.signOut();
-      throw new Error('No user profile was found in app_profiles.');
-    }
+          showMessage("Login successful. Opening admin page...", "ok");
 
-    redirectForRole(profile);
+          setTimeout(function () {
+            window.location.href = "admin.html";
+          }, 400);
 
-  }catch(err){
-    console.error(err);
-    showMessage(err?.message || 'Invalid login credentials ⚠️', 'error');
-  }finally{
-    loginBtn.disabled = false;
-    loginBtn.textContent = 'LOGIN';
-  }
-});
+        } catch (error) {
+          console.error("Login error:", error);
+          showMessage(error.message || "Unable to sign in.", "error");
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign In";
+        }
+      });
 
-resetBtn.addEventListener('click', async () => {
-  showMessage('');
+      resetBtn.addEventListener("click", async function () {
+        clearMessage();
 
-  const email = emailEl.value.trim();
+        const email = emailInput.value.trim();
 
-  if(!email){
-    showMessage('Enter your email first, then press RESET PASSWORD.', 'error');
-    emailEl.focus();
-    return;
-  }
+        if (!email) {
+          showMessage(
+            "Enter your email address first, then press Reset Password.",
+            "error"
+          );
+          emailInput.focus();
+          return;
+        }
 
-  resetBtn.disabled = true;
-  resetBtn.textContent = 'שולח קישור...';
+        resetBtn.disabled = true;
+        resetBtn.textContent = "Sending Reset Email...";
 
-  try{
-    const redirectTo = new URL('update-password.html', window.location.href).href;
+        try {
+          const supabaseClient = getClient();
 
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo
-    });
+          const redirectTo = new URL("reset-password.html", window.location.href).href;
 
-    if(error) throw error;
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(
+            email,
+            { redirectTo }
+          );
 
-    showMessage(
-      '✅ Password reset email sent. Check your inbox and spam folder.',
-      'success'
-    );
+          if (error) {
+            throw error;
+          }
 
-  }catch(err){
-    console.error(err);
-    showMessage(err?.message || 'Could not send reset email.', 'error');
-  }finally{
-    resetBtn.disabled = false;
-    resetBtn.textContent = '🔑 שכחתי סיסמה / RESET PASSWORD';
-  }
-});
+          showMessage(
+            "Password reset email sent. Check your email.",
+            "ok"
+          );
 
-(async () => {
-  try{
-    const { data } = await sb.auth.getSession();
-    const user = data?.session?.user;
+        } catch (error) {
+          console.error("Password reset error:", error);
+          showMessage(error.message || "Unable to send reset email.", "error");
+        } finally {
+          resetBtn.disabled = false;
+          resetBtn.textContent = "Forgot / Reset Password";
+        }
+      });
 
-    if(user){
-      const profile = await getProfile(user.id);
-      if(profile) redirectForRole(profile);
-    }
-  }catch(e){
-    console.warn(e);
-  }
-})();
-</script>
+      registerSynagogueBtn.addEventListener("click", function () {
+        window.location.href = "register.html";
+      });
 
+      registerMemberBtn.addEventListener("click", function () {
+        window.location.href = "member-register.html";
+      });
+
+      masterLoginBtn.addEventListener("click", function () {
+        window.location.href = "master-login.html";
+      });
+
+      window.addEventListener("load", redirectIfAlreadyLoggedIn);
+    })();
+  </script>
 </body>
 </html>
