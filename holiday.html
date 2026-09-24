@@ -1,273 +1,354 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mb-build" content="holiday-box-sukkot-2026-v1">
 <title>חג סוכות שמח</title>
 
 <style>
-*{
-  box-sizing:border-box;
+:root{
+  --navy:#101b43;
+  --navy2:#17285e;
+  --gold:#c79b43;
+  --gold2:#f0d48a;
+  --cream:#fffaf0;
+  --green:#176b42;
+  --ink:#33240f;
 }
+*{box-sizing:border-box}
 
 html,body{
   margin:0;
-  padding:0;
   width:100%;
-  min-height:100%;
+  height:100%;
+  overflow:hidden;
+  background:transparent;
   font-family:Arial,"Noto Sans Hebrew",sans-serif;
-  background:#fffdf7;
-  color:#1d1d1d;
 }
 
-body{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-/* TOP BAR */
-.topbar{
-  width:100%;
-  min-height:115px;
-  background:#000;
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 22px;
-  direction:ltr;
-}
-
-.close-button{
-  width:92px;
-  height:92px;
-  border-radius:50%;
-  border:none;
-  background:#c9c9c9;
-  color:#000;
-  font-size:62px;
-  line-height:1;
-  display:flex;
+#holidayRoot{
+  position:absolute;
+  inset:0;
+  display:none;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
+  padding:1.2vh 1vw;
+  background:transparent;
 }
 
-.page-name{
-  font-size:58px;
-  font-weight:700;
-  text-transform:lowercase;
-}
+#holidayRoot.active{display:flex}
 
-/* MAIN */
-main{
-  width:min(100%,900px);
-  padding:28px 18px 60px;
-}
-
-/* HOLIDAY FRAME */
-.holiday-frame{
+.holiday-card{
   position:relative;
-  border:8px solid #d8a22e;
-  border-radius:30px;
-  padding:34px 20px;
+  width:100%;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+  border:clamp(4px,.45vw,8px) double var(--gold);
+  border-radius:24px;
   background:
-    linear-gradient(rgba(255,255,255,.94),rgba(255,255,255,.94)),
-    repeating-linear-gradient(
-      45deg,
-      #f4d27a 0,
-      #f4d27a 8px,
-      #fff6d5 8px,
-      #fff6d5 16px
-    );
-  box-shadow:0 8px 24px rgba(0,0,0,.15);
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.98),rgba(255,248,220,.98) 52%,rgba(222,195,126,.98));
+  box-shadow:
+    inset 0 0 28px rgba(114,77,24,.23),
+    0 5px 18px rgba(0,0,0,.20);
+  color:var(--ink);
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+  gap:.55vh;
+  padding:1.2vh 1.2vw .9vh;
+}
+
+.corner{
+  position:absolute;
+  font-size:clamp(22px,2.3vw,44px);
+  color:var(--gold);
+  opacity:.9;
+  line-height:1;
+}
+.corner.tl{top:.5vh;left:.55vw}
+.corner.tr{top:.5vh;right:.55vw}
+.corner.bl{bottom:.5vh;left:.55vw}
+.corner.br{bottom:.5vh;right:.55vw}
+
+.holiday-title{
+  margin:0;
+  text-align:center;
+  color:var(--green);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(30px,3.4vw,64px);
+  line-height:1.05;
+  font-weight:1000;
+  text-shadow:0 2px 0 #f5d77e;
+}
+
+.holiday-subtitle{
+  text-align:center;
+  color:#7a5519;
+  font-size:clamp(17px,1.55vw,29px);
+  font-weight:1000;
+  line-height:1.2;
+}
+
+.holiday-body{
+  min-height:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.8vw;
+  align-items:stretch;
+}
+
+.panel{
+  min-height:0;
+  border:2px solid #b98a36;
+  border-radius:17px;
+  background:rgba(255,253,244,.92);
+  padding:.75vh .8vw;
   overflow:hidden;
 }
 
-.holiday-frame::before,
-.holiday-frame::after{
-  content:"✡";
-  position:absolute;
-  color:#d19c26;
-  font-size:52px;
-  opacity:.8;
-}
-
-.holiday-frame::before{
-  top:8px;
-  right:14px;
-}
-
-.holiday-frame::after{
-  bottom:8px;
-  left:14px;
-}
-
-/* BACK BUTTON */
-.back-row{
-  direction:ltr;
-  margin-bottom:24px;
-}
-
-.back-button{
-  display:inline-block;
-  text-decoration:none;
-  background:#eeeeee;
-  color:#006ee6;
-  padding:8px 16px;
-  border-radius:18px;
-  font-size:18px;
-}
-
-/* HEBREW HOLIDAY TITLE */
-.hebrew-title{
-  margin:10px 0 8px;
+.panel h2{
+  margin:0 0 .5vh;
   text-align:center;
-  direction:rtl;
-  font-size:48px;
+  color:var(--navy);
+  font-size:clamp(16px,1.35vw,26px);
+  line-height:1.15;
+}
+
+.big-blessing{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:.9vh;
+}
+
+.big-blessing .emoji{
+  font-size:clamp(38px,4vw,76px);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));
+}
+
+.big-blessing .he{
+  font-size:clamp(22px,2.1vw,42px);
+  font-weight:1000;
+  color:var(--green);
+  line-height:1.25;
+}
+
+.big-blessing .en{
+  font-size:clamp(15px,1.2vw,23px);
   font-weight:900;
-  color:#135c2c;
-  text-shadow:0 2px 0 #f4d36c;
+  color:var(--navy);
+  line-height:1.25;
+  direction:ltr;
 }
 
-.sub-hebrew{
+.schedule{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:.42vh;
+  direction:ltr;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:5.8em 1fr;
+  gap:.6vw;
+  align-items:center;
+  border-bottom:1px dotted #ac8745;
+  padding:.28vh .1vw;
+  font-size:clamp(12px,.92vw,18px);
+  line-height:1.2;
+}
+.row:last-child{border-bottom:0}
+.row strong{color:var(--navy);white-space:nowrap}
+.row span{font-weight:900;color:#4a3210}
+
+.footer{
   text-align:center;
-  font-size:25px;
-  color:#8a6415;
-  margin-bottom:30px;
+  color:#fff6ba;
+  background:linear-gradient(180deg,var(--navy2),#0a1230);
+  border:2px ridge var(--gold);
+  border-radius:10px;
+  padding:.42vh .7vw;
+  font-size:clamp(12px,.95vw,18px);
+  font-weight:1000;
+  line-height:1.2;
 }
 
-/* ENGLISH */
-.english-title{
-  margin:18px 0 28px;
-  text-align:center;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:42px;
-  font-weight:700;
+#statusBadge{
+  position:absolute;
+  left:.8vw;
+  bottom:.8vh;
+  z-index:3;
+  direction:ltr;
+  border:1px solid #b98a36;
+  border-radius:999px;
+  background:rgba(255,255,255,.86);
+  color:#6b4b14;
+  padding:.2vh .55vw;
+  font-size:clamp(9px,.65vw,12px);
+  font-weight:900;
 }
 
-.schedule-box{
-  border:3px solid #d3af58;
-  border-radius:20px;
-  padding:24px;
-  background:#fffaf0;
+.expired{
+  display:none!important;
 }
 
-.schedule-title{
-  text-align:center;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:31px;
-  margin:0 0 12px;
-}
-
-.time-title{
-  text-align:center;
-  font-size:28px;
-  font-weight:700;
-  margin:0;
-}
-
-/* MOBILE */
-@media(max-width:600px){
-  .topbar{
-    min-height:112px;
-    padding:10px 14px;
-  }
-
-  .close-button{
-    width:90px;
-    height:90px;
-    font-size:58px;
-  }
-
-  .page-name{
-    font-size:53px;
-  }
-
-  main{
-    padding:26px 10px 50px;
-  }
-
-  .holiday-frame{
-    padding:28px 14px;
-    border-width:6px;
-  }
-
-  .hebrew-title{
-    font-size:40px;
-  }
-
-  .english-title{
-    font-size:31px;
-  }
-
-  .schedule-title{
-    font-size:28px;
-  }
-
-  .time-title{
-    font-size:25px;
-  }
+@media(max-width:700px){
+  .holiday-body{grid-template-columns:1fr}
+  .schedule{gap:.2vh}
+  .row{font-size:12px}
 }
 </style>
 </head>
 
 <body>
+<div id="holidayRoot" aria-hidden="true">
+  <section class="holiday-card" role="region" aria-label="Sukkot holiday message">
+    <div class="corner tl">✡</div>
+    <div class="corner tr">✡</div>
+    <div class="corner bl">✡</div>
+    <div class="corner br">✡</div>
 
-<header class="topbar">
-  <button class="close-button" onclick="goBack()" aria-label="Close">×</button>
-  <div class="page-name">holiday</div>
-</header>
+    <h1 class="holiday-title">חג סוכות שמח</h1>
+    <div class="holiday-subtitle">מועדים לשמחה • Chag Sukkot Sameach</div>
 
-<main>
+    <div class="holiday-body">
+      <section class="panel">
+        <div class="big-blessing">
+          <div class="emoji">🌿 🍋 🌿</div>
+          <div class="he">
+            חג שמח לכל קהילת בית הכנסת<br>
+            שנזכה לשבת בסוכה בשמחה,<br>
+            באחדות, בברכה ובשלום
+          </div>
+          <div class="en">
+            Wishing our entire synagogue community<br>
+            a joyful and peaceful Sukkot.
+          </div>
+        </div>
+      </section>
 
-  <section class="holiday-frame">
-
-    <div class="back-row">
-      <a class="back-button" href="index.html">
-        ← Return to Board
-      </a>
+      <section class="panel">
+        <h2>סוכות תשפ״ז • Sukkot 5787</h2>
+        <div class="schedule">
+          <div class="row"><strong>Sep 25</strong><span>Erev Sukkot • Candle lighting 6:30 PM</span></div>
+          <div class="row"><strong>Sep 26</strong><span>Sukkot I • Candle lighting 7:27 PM</span></div>
+          <div class="row"><strong>Sep 27</strong><span>Sukkot II • Havdalah 7:25 PM</span></div>
+          <div class="row"><strong>Sep 28</strong><span>Chol HaMoed Sukkot</span></div>
+          <div class="row"><strong>Sep 29</strong><span>Chol HaMoed Sukkot</span></div>
+          <div class="row"><strong>Sep 30</strong><span>Chol HaMoed Sukkot</span></div>
+          <div class="row"><strong>Oct 1</strong><span>Chol HaMoed Sukkot</span></div>
+          <div class="row"><strong>Oct 2</strong><span>Hoshana Rabbah • Candle lighting 6:18 PM</span></div>
+          <div class="row"><strong>Oct 3</strong><span>Shemini Atzeret • Candle lighting 7:15 PM</span></div>
+          <div class="row"><strong>Oct 4</strong><span>Simchat Torah • Havdalah 7:13 PM</span></div>
+        </div>
+      </section>
     </div>
 
-    <h1 class="hebrew-title" lang="he" dir="rtl">
-      חג סוכות שמח
-    </h1>
-
-    <div class="sub-hebrew" lang="he" dir="rtl">
-      מועדים לשמחה
+    <div class="footer">
+      מופיע אוטומטית ל־20 שניות בכל דקה • Automatically shown for 20 seconds every minute
     </div>
 
-    <h2 class="english-title">
-      Jewish Holiday
-    </h2>
-
-    <div class="schedule-box">
-
-      <div class="schedule-title">
-        Synagogue Holiday Schedule
-      </div>
-
-      <div class="time-title">
-        Synagogue New York Time
-      </div>
-
-    </div>
-
+    <div id="statusBadge">20 sec / every 1 min</div>
   </section>
-
-</main>
+</div>
 
 <script>
-function goBack(){
-  if(window.history.length > 1){
-    window.history.back();
-  }else{
-    window.location.href = "index.html";
-  }
-}
-</script>
+(function(){
+  "use strict";
 
+  // New York holiday window:
+  // Start immediately on Sep 24, 2026 so the board can announce Sukkot in advance.
+  // Stop automatically after Simchat Torah is over.
+  const START_NY = Date.parse("2026-09-24T00:00:00-04:00");
+  const END_NY   = Date.parse("2026-10-04T23:59:59-04:00");
+
+  const SHOW_MS  = 20 * 1000;  // visible 20 seconds
+  const CYCLE_MS = 60 * 1000;  // every 1 minute
+
+  const root = document.getElementById("holidayRoot");
+  let hideTimer = null;
+  let cycleTimer = null;
+
+  function inHolidayWindow(){
+    const now = Date.now();
+    return now >= START_NY && now <= END_NY;
+  }
+
+  function notifyParent(type){
+    try{
+      if(window.parent && window.parent !== window){
+        window.parent.postMessage({source:"holiday.html",type:type}, window.location.origin);
+      }
+    }catch(e){}
+  }
+
+  function hideHoliday(){
+    if(!root) return;
+    root.classList.remove("active");
+    root.setAttribute("aria-hidden","true");
+    notifyParent("HOLIDAY_HIDE");
+  }
+
+  function showHoliday(){
+    if(!root || !inHolidayWindow()){
+      hideHoliday();
+      return;
+    }
+    root.classList.add("active");
+    root.setAttribute("aria-hidden","false");
+    notifyParent("HOLIDAY_SHOW");
+
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hideHoliday, SHOW_MS);
+  }
+
+  function startRotation(){
+    clearInterval(cycleTimer);
+    clearTimeout(hideTimer);
+
+    if(!inHolidayWindow()){
+      hideHoliday();
+      document.documentElement.classList.add("expired");
+      notifyParent("HOLIDAY_EXPIRED");
+      return;
+    }
+
+    // SHOW RIGHT AWAY.
+    showHoliday();
+
+    // Then show at the start of every one-minute cycle.
+    cycleTimer = setInterval(function(){
+      if(!inHolidayWindow()){
+        clearInterval(cycleTimer);
+        hideHoliday();
+        notifyParent("HOLIDAY_EXPIRED");
+        return;
+      }
+      showHoliday();
+    }, CYCLE_MS);
+  }
+
+  // Expose simple controls for the parent index if needed.
+  window.HolidayPage = {
+    show: showHoliday,
+    hide: hideHoliday,
+    start: startRotation,
+    isActiveDate: inHolidayWindow
+  };
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", startRotation, {once:true});
+  }else{
+    startRotation();
+  }
+})();
+</script>
 </body>
 </html>
