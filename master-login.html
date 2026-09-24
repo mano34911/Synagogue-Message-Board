@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<title>Master Admin Login</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,"Noto Sans Hebrew",sans-serif;background:radial-gradient(circle at top,#143f7d,#06152d 50%,#020710);color:#fff;display:grid;place-items:center;padding:24px}
+.card{width:min(520px,96vw);background:linear-gradient(180deg,#0b2b5d,#061a3b);border:3px solid #d7a62d;border-radius:24px;box-shadow:0 20px 60px #0008,inset 0 0 0 2px #fff2a633;padding:28px}
+h1{color:#f6d469;text-align:center;margin:0 0 8px}
+.muted{color:#d8dfef;font-size:14px;text-align:center;margin-bottom:18px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:800;margin-bottom:14px}
+input{width:100%;padding:13px;border-radius:10px;border:1px solid #d7a62d;background:#fff;color:#111;font-size:16px}
+button{width:100%;border:0;border-radius:11px;padding:13px 18px;background:#d7a62d;color:#07152d;font-weight:900;font-size:16px;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.msg{min-height:24px;text-align:center;margin-top:14px;font-weight:800;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>👑 Master Admin Login</h1>
+  <div class="muted">Synagogue Message Board</div>
+
+  <form id="loginForm">
+    <label>Email
+      <input id="email" type="email" autocomplete="username" required>
+    </label>
+    <label>Password
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button id="btn" type="submit">MASTER ADMIN LOGIN</button>
+  </form>
+
+  <div id="msg" class="msg"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
+const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storageKey: "synagogue-master-admin-auth"
+  }
+});
+
+const form = document.getElementById("loginForm");
+const btn = document.getElementById("btn");
+const msg = document.getElementById("msg");
+
+function show(text, good=false){
+  msg.textContent = text || "";
+  msg.style.color = good ? "#83ff9d" : "#ffd56b";
+}
+
+async function verifyMaster(user){
+  const { data, error } = await sb
+    .from("app_profiles")
+    .select("user_id,role,status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) throw new Error("Master profile check failed: " + error.message);
+  if (!data) throw new Error("Login worked, but no app_profiles record was found.");
+
+  const role = String(data.role || "").toLowerCase();
+  const status = String(data.status || "").toLowerCase();
+
+  if (role !== "master_admin") {
+    throw new Error("This account is not marked as master_admin.");
+  }
+
+  if (status !== "approved") {
+    throw new Error("Master admin account is not approved. Current status: " + (status || "unknown"));
+  }
+
+  return data;
+}
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  btn.disabled = true;
+  btn.textContent = "SIGNING IN...";
+  show("Signing in...");
+
+  try {
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    await sb.auth.signOut({ scope: "local" });
+
+    const { data, error } = await sb.auth.signInWithPassword({email, password});
+    if (error) throw error;
+    if (!data?.user) throw new Error("Supabase did not return a user.");
+
+    await verifyMaster(data.user);
+
+    show("Master admin login successful.", true);
+    window.location.replace("master-admin.html");
+  } catch (e) {
+    console.error(e);
+    show(e.message || "Login failed.");
+    btn.disabled = false;
+    btn.textContent = "MASTER ADMIN LOGIN";
+  }
+});
+</script>
+</body>
+</html>
