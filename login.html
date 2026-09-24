@@ -1,148 +1,364 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Synagogue Message Board - Admin Login</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:Arial,sans-serif}
-body{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:#07163c;color:#fff;padding:20px
-}
-.card{
-  width:min(440px,100%);background:#fff8df;color:#1d1d1d;
-  border:4px solid #d7a62d;border-radius:24px;padding:28px;
-  box-shadow:0 18px 55px #0008
-}
-h1{margin:0 0 6px;text-align:center;color:#0b1c4b;font-size:28px}
-h2{margin:0 0 22px;text-align:center;color:#74520a;font-size:18px}
-label{display:block;margin:13px 0 6px;font-weight:700}
-input{
-  width:100%;padding:14px;border:1px solid #b9b9b9;border-radius:10px;
-  font-size:16px;background:#fff
-}
-button{
-  width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;
-  font-size:17px;font-weight:700;background:#0b1c4b;color:#fff;cursor:pointer
-}
-button:disabled{opacity:.6;cursor:not-allowed}
-#msg{min-height:26px;margin-top:14px;text-align:center;white-space:pre-wrap;font-weight:700}
-.note{text-align:center;color:#666;font-size:13px;margin-top:14px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>כניסה למערכת</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --navy:#0d1d4d;
+      --navy2:#12275f;
+      --gold:#d4a93e;
+      --gold2:#f4d77d;
+      --cream:#fff8df;
+      --green:#159447;
+      --red:#b42318;
+      --text:#211b12;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:var(--navy);
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      color:var(--text);
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:34px 16px 40px;
+    }
+
+    .card{
+      width:min(760px,100%);
+      background:var(--cream);
+      border:7px solid var(--gold);
+      border-radius:40px;
+      padding:42px 34px 34px;
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+    }
+
+    h1{
+      margin:0 0 22px;
+      text-align:center;
+      color:var(--navy);
+      font-size:clamp(38px,7vw,58px);
+      line-height:1.05;
+      font-weight:900;
+    }
+
+    .subtitle{
+      text-align:center;
+      font-size:clamp(20px,4vw,31px);
+      margin-bottom:34px;
+    }
+
+    .field{
+      margin-bottom:23px;
+    }
+
+    label{
+      display:block;
+      font-size:clamp(20px,4vw,28px);
+      font-weight:800;
+      margin:0 0 8px;
+    }
+
+    input{
+      width:100%;
+      padding:19px 18px;
+      border:3px solid #d2ad4e;
+      border-radius:20px;
+      background:#fff;
+      color:#111;
+      font-size:clamp(20px,4vw,28px);
+      font-weight:700;
+      outline:none;
+      direction:ltr;
+      text-align:left;
+    }
+
+    input:focus{
+      border-color:var(--navy2);
+      box-shadow:0 0 0 3px rgba(18,39,95,.12);
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:19px;
+      padding:18px 16px;
+      font-size:clamp(18px,3.7vw,25px);
+      font-weight:900;
+      cursor:pointer;
+      margin-top:8px;
+    }
+
+    .btn-primary{
+      background:var(--navy2);
+      color:#fff;
+    }
+
+    .btn-reset{
+      background:#d7b24d;
+      color:#17130b;
+      margin-top:14px;
+    }
+
+    .bottom-row{
+      display:flex;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .bottom-row a{
+      flex:1;
+      text-decoration:none;
+      text-align:center;
+      padding:17px 10px;
+      border-radius:18px;
+      font-size:clamp(18px,3.6vw,24px);
+      font-weight:900;
+    }
+
+    .home{
+      background:var(--navy2);
+      color:#fff;
+    }
+
+    .register{
+      background:var(--green);
+      color:#fff;
+    }
+
+    .msg{
+      min-height:34px;
+      margin-top:12px;
+      text-align:center;
+      font-size:clamp(18px,3.8vw,24px);
+      font-weight:800;
+      line-height:1.35;
+    }
+
+    .msg.error{color:var(--red)}
+    .msg.success{color:var(--green)}
+
+    .small{
+      margin-top:14px;
+      text-align:center;
+      font-size:15px;
+      color:#615840;
+    }
+
+    @media(max-width:560px){
+      body{padding:34px 12px}
+      .card{
+        padding:34px 20px 28px;
+        border-width:6px;
+        border-radius:34px;
+      }
+      .bottom-row{gap:10px}
+    }
+  </style>
 </head>
+
 <body>
-<div class="card">
-  <h1>Synagogue Message Board</h1>
-  <h2>Administrator Login</h2>
 
-  <form id="loginForm">
-    <label for="email">Email</label>
-    <input id="email" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+  <main class="card">
+    <h1>🔐 כניסה למערכת</h1>
+    <div class="subtitle">Master Admin • Synagogue Owner • Member</div>
 
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" required>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">אימייל</label>
+        <input id="email" type="email" autocomplete="email" required>
+      </div>
 
-    <button id="loginBtn" type="submit">ADMIN LOGIN</button>
-  </form>
+      <div class="field">
+        <label for="password">סיסמה</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
 
-  <div id="msg"></div>
-  <div class="note">Secure login through Supabase Authentication</div>
-</div>
+      <button class="btn btn-primary" id="loginBtn" type="submit">LOGIN</button>
+      <button class="btn btn-reset" id="resetBtn" type="button">🔑 שכחתי סיסמה / RESET PASSWORD</button>
+
+      <div id="message" class="msg"></div>
+    </form>
+
+    <div class="bottom-row">
+      <a class="register" href="register.html">הרשמת חבר</a>
+      <a class="home" href="index.html">ללוח</a>
+    </div>
+
+    <div class="small">
+      Password reset will be sent to the email address entered above.
+    </div>
+  </main>
 
 <script>
-const SUPABASE_URL = "https://chcfhxkggbrlxaopnfum.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D";
+const SUPABASE_URL = 'https://chcfhxkggbrlxaopnfum.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_rwCYiLLLcYCOm7X9JXxAtQ_9ailfQ6D';
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: false,
-    storageKey: "synagogue-message-board-auth"
-  }
-});
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const form = document.getElementById("loginForm");
-const btn = document.getElementById("loginBtn");
-const msg = document.getElementById("msg");
+const form = document.getElementById('loginForm');
+const emailEl = document.getElementById('email');
+const passwordEl = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const resetBtn = document.getElementById('resetBtn');
+const message = document.getElementById('message');
 
-function show(text, good=false){
-  msg.textContent = text || "";
-  msg.style.color = good ? "#167a32" : "#b00020";
+function showMessage(text, type=''){
+  message.textContent = text || '';
+  message.className = 'msg' + (type ? ' ' + type : '');
 }
 
-async function loadProfile(userId){
+function normalizeRole(role){
+  return String(role || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g,'_')
+    .replace(/-/g,'_');
+}
+
+async function getProfile(userId){
   const { data, error } = await sb
-    .from("app_profiles")
-    .select("user_id,role,status,synagogue_id,full_name")
-    .eq("user_id", userId)
+    .from('app_profiles')
+    .select('*')
+    .eq('id', userId)
     .maybeSingle();
 
-  if (error) throw new Error("Profile check failed: " + error.message);
-  if (!data) throw new Error("Login worked, but no app_profiles record was found for this account.");
-
+  if(error) throw error;
   return data;
 }
 
-function destinationFor(profile){
-  const role = String(profile.role || "").toLowerCase();
-  const status = String(profile.status || "").toLowerCase();
+function redirectForRole(profile){
+  const role = normalizeRole(profile?.role);
+  const status = String(profile?.status || '').trim().toLowerCase();
 
-  if (status !== "approved") {
-    throw new Error("This account is not approved. Current status: " + (status || "unknown"));
+  if(status && !['approved','active'].includes(status)){
+    throw new Error('Your account is not approved yet.');
   }
 
-  if (role === "master_admin") return "master-admin.html";
-
-  if (role === "synagogue_owner") {
-    if (!profile.synagogue_id) {
-      throw new Error("The synagogue owner account is missing its synagogue UUID.");
-    }
-    localStorage.setItem("synagogue_id", profile.synagogue_id);
-    return "admin.html";
+  if(role === 'master_admin' || role === 'master'){
+    location.href = 'master-admin.html';
+    return;
   }
 
-  throw new Error("This account is not an administrator. Current role: " + (role || "unknown"));
+  if(role === 'synagogue_owner' || role === 'synagogue_admin' || role === 'owner'){
+    location.href = 'synagogue-admin.html';
+    return;
+  }
+
+  if(role === 'member'){
+    location.href = 'member-portal.html';
+    return;
+  }
+
+  throw new Error('Account role not recognized.');
 }
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  btn.disabled = true;
-  btn.textContent = "SIGNING IN...";
-  show("");
+  showMessage('');
 
-  try {
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
+  const email = emailEl.value.trim();
+  const password = passwordEl.value;
 
-    // Clear only the local session once, on an intentional login attempt.
-    await sb.auth.signOut({ scope: "local" });
+  if(!email || !password){
+    showMessage('נא להזין אימייל וסיסמה.', 'error');
+    return;
+  }
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-    if (!data?.user) throw new Error("Supabase did not return a signed-in user.");
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'מתחבר...';
 
-    const profile = await loadProfile(data.user.id);
-    const destination = destinationFor(profile);
+  try{
+    const { data, error } = await sb.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    show("Login successful. Opening admin panel...", true);
+    if(error) throw error;
+    if(!data?.user) throw new Error('Login failed.');
 
-    // No automatic startup redirect loop; redirect happens only after a successful button login.
-    window.location.replace(destination);
+    const profile = await getProfile(data.user.id);
 
-  } catch (err) {
+    if(!profile){
+      await sb.auth.signOut();
+      throw new Error('No user profile was found in app_profiles.');
+    }
+
+    redirectForRole(profile);
+
+  }catch(err){
     console.error(err);
-    show(err?.message || "Admin login failed.");
-    btn.disabled = false;
-    btn.textContent = "ADMIN LOGIN";
+    showMessage(err?.message || 'Invalid login credentials ⚠️', 'error');
+  }finally{
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'LOGIN';
   }
 });
+
+resetBtn.addEventListener('click', async () => {
+  showMessage('');
+
+  const email = emailEl.value.trim();
+
+  if(!email){
+    showMessage('Enter your email first, then press RESET PASSWORD.', 'error');
+    emailEl.focus();
+    return;
+  }
+
+  resetBtn.disabled = true;
+  resetBtn.textContent = 'שולח קישור...';
+
+  try{
+    const redirectTo = new URL('update-password.html', window.location.href).href;
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo
+    });
+
+    if(error) throw error;
+
+    showMessage(
+      '✅ Password reset email sent. Check your inbox and spam folder.',
+      'success'
+    );
+
+  }catch(err){
+    console.error(err);
+    showMessage(err?.message || 'Could not send reset email.', 'error');
+  }finally{
+    resetBtn.disabled = false;
+    resetBtn.textContent = '🔑 שכחתי סיסמה / RESET PASSWORD';
+  }
+});
+
+(async () => {
+  try{
+    const { data } = await sb.auth.getSession();
+    const user = data?.session?.user;
+
+    if(user){
+      const profile = await getProfile(user.id);
+      if(profile) redirectForRole(profile);
+    }
+  }catch(e){
+    console.warn(e);
+  }
+})();
 </script>
+
 </body>
 </html>
