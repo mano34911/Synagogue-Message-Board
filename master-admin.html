@@ -2,812 +2,408 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="google" content="notranslate">
-  <title>Master Admin Dashboard</title>
+  <title>Master Admin — Synagogue Message Board</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 
   <style>
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
-    body{
-      min-height:100vh;
-      color:#fff;
-      background:
-        radial-gradient(circle at top,#173f7b 0,#081c3d 42%,#020711 100%);
+    :root{
+      --navy:#071c3f;
+      --navy2:#0b2d63;
+      --gold:#e0aa22;
+      --cream:#f8e7a7;
+      --green:#25a85a;
+      --red:#c82127;
+      --white:#fff;
+      --ink:#07162f;
+      --line:#d7dce5;
     }
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:10;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:14px 18px;
-      background:rgba(4,15,34,.96);
-      border-bottom:2px solid #d4aa42;
-      box-shadow:0 4px 20px rgba(0,0,0,.35);
-    }
-    .brand{
-      font-weight:900;
-      color:#f4d678;
-      font-size:20px;
-    }
-    .top-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    button{
-      border:0;
-      border-radius:10px;
-      padding:10px 14px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .btn-gold{background:linear-gradient(180deg,#f5d979,#d6a632);color:#17213b}
-    .btn-blue{background:#174a8d;color:#fff;border:1px solid #6e9bd2}
-    .btn-green{background:#167449;color:#fff;border:1px solid #46a478}
-    .btn-red{background:#8b2834;color:#fff;border:1px solid #c85e6a}
-    .btn-gray{background:#475569;color:#fff;border:1px solid #7b8796}
-    .wrap{
-      width:min(1500px,97vw);
+    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#030a14;color:#fff}
+    body{padding:20px}
+    .shell{
+      width:min(1550px,98vw);
       margin:0 auto;
-      padding:22px 0 40px;
+      background:linear-gradient(180deg,var(--navy2),var(--navy));
+      border:4px solid var(--gold);
+      border-radius:34px;
+      padding:24px;
+      box-shadow:0 18px 55px #0009;
     }
-    .hero{
-      background:linear-gradient(180deg,#0b2c5e,#061a3a);
-      border:3px solid #d4aa42;
-      border-radius:22px;
-      padding:22px;
-      box-shadow:0 18px 50px rgba(0,0,0,.4);
+    h1{margin:0;color:#f7d76b;text-align:center;font-size:clamp(28px,4vw,52px)}
+    .subtitle{text-align:center;color:#dce7fb;margin:8px 0 20px;font-size:18px}
+    .toolbar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    button,a.btn{
+      border:0;border-radius:14px;padding:12px 18px;font-weight:800;font-size:16px;cursor:pointer;
+      text-decoration:none;display:inline-flex;align-items:center;justify-content:center;
     }
-    h1{
-      margin:0 0 6px;
-      color:#f4d678;
-      font-size:clamp(28px,5vw,42px);
+    .gold{background:var(--gold);color:#06204b}
+    .white{background:#fff;color:#06204b}
+    .green{background:var(--green);color:#fff}
+    .red{background:var(--red);color:#fff}
+    .blue{background:#1c67d2;color:#fff}
+    .gray{background:#687386;color:#fff}
+    .status{
+      padding:12px 14px;border-radius:14px;background:#ffffff12;border:1px solid #ffffff26;
+      margin:12px 0 18px;text-align:center;font-weight:700
     }
-    .muted{color:#c7d2e4}
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:12px;
-      margin-top:18px;
+    .error{background:#6b1018;color:#fff}
+    .success{background:#0c5730;color:#fff}
+    .table-wrap{overflow:auto;border-radius:20px;border:1px solid #ffffff22;background:#fff}
+    table{width:100%;border-collapse:collapse;min-width:1450px;color:#111}
+    thead th{
+      background:var(--cream);padding:15px 10px;text-align:left;font-size:17px;position:sticky;top:0;z-index:1
     }
-    .stat{
-      border:1px solid #5b75a2;
-      border-radius:16px;
-      background:#0a234c;
-      padding:16px;
-      text-align:center;
+    tbody td{padding:14px 10px;border-top:1px solid var(--line);vertical-align:top;background:#fff}
+    tbody tr:nth-child(even) td{background:#fbfcfe}
+    .name{font-weight:900;font-size:18px}
+    .small{font-size:13px;color:#58606c;line-height:1.35}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:800;background:#e9edf3}
+    .pill.active,.pill.approved{background:#d8f3e3;color:#176633}
+    .pill.pending{background:#fff0c9;color:#845d00}
+    .pill.suspended{background:#ffd9da;color:#8f141a}
+    input{
+      width:120px;padding:10px;border:1px solid #aab1bc;border-radius:10px;font-size:16px
     }
-    .stat b{
-      display:block;
-      color:#f6d675;
-      font-size:28px;
-      margin-bottom:4px;
-    }
-    .toolbar{
-      display:grid;
-      grid-template-columns:1fr auto auto;
-      gap:10px;
-      margin:18px 0;
-    }
-    input,select{
-      width:100%;
-      border:1px solid #8093b5;
-      border-radius:10px;
-      padding:12px 13px;
-      background:#fff;
-      color:#111;
-      font-size:15px;
-      outline:none;
-    }
-    .panel{
-      background:#071a39;
-      border:2px solid #b9933c;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 14px 36px rgba(0,0,0,.3);
-    }
-    .table-wrap{overflow:auto}
-    table{
-      width:100%;
-      min-width:1100px;
-      border-collapse:collapse;
-    }
-    th,td{
-      padding:12px 10px;
-      border-bottom:1px solid #29466f;
-      text-align:left;
-      vertical-align:top;
-      font-size:14px;
-    }
-    th{
-      position:sticky;
-      top:0;
-      z-index:2;
-      background:#102c58;
-      color:#f4d678;
-    }
-    td{color:#e8edf6}
-    .name{font-weight:800;color:#fff}
-    .small{font-size:12px;color:#aebbd0}
-    .badge{
-      display:inline-block;
-      padding:5px 9px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:900;
-      text-transform:uppercase;
-    }
-    .pending{background:#69510e;color:#ffeaa0}
-    .approved{background:#154d33;color:#b8ffdb}
-    .suspended{background:#6d2630;color:#ffd2d8}
-    .unknown{background:#46566d;color:#e7eef8}
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-      min-width:240px;
-    }
-    .actions button{
-      padding:8px 10px;
-      font-size:12px;
-    }
-    .message{
-      display:none;
-      margin:14px 0;
-      padding:12px 14px;
-      border-radius:12px;
-      line-height:1.4;
-    }
-    .message.ok{
-      display:block;
-      background:#123f2d;
-      border:1px solid #3d9a6f;
-      color:#d9ffec;
-    }
-    .message.error{
-      display:block;
-      background:#501f28;
-      border:1px solid #b95d70;
-      color:#ffe4e9;
-    }
-    .message.info{
-      display:block;
-      background:#173558;
-      border:1px solid #4c79aa;
-      color:#e8f1ff;
-    }
-    .empty{
-      padding:30px;
-      text-align:center;
-      color:#b8c4d8;
-    }
-    .modal{
-      position:fixed;
-      inset:0;
-      z-index:100;
-      display:none;
-      place-items:center;
-      padding:20px;
-      background:rgba(0,0,0,.7);
-    }
-    .modal.open{display:grid}
-    .modal-card{
-      width:min(720px,96vw);
-      max-height:90vh;
-      overflow:auto;
-      background:#071a39;
-      border:3px solid #d4aa42;
-      border-radius:18px;
-      padding:22px;
-    }
-    .modal h2{margin-top:0;color:#f4d678}
-    .detail-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px 16px;
-    }
-    .detail{
-      background:#0d2a55;
-      border:1px solid #365884;
-      border-radius:10px;
-      padding:10px;
-      overflow-wrap:anywhere;
-    }
-    .detail span{
-      display:block;
-      color:#aebbd0;
-      font-size:12px;
-      margin-bottom:3px;
-    }
-    @media(max-width:900px){
-      .stats{grid-template-columns:1fr 1fr}
-      .toolbar{grid-template-columns:1fr}
-      .detail-grid{grid-template-columns:1fr}
-      .topbar{align-items:flex-start;flex-direction:column}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;min-width:380px}
+    .actions button{padding:10px 13px;font-size:14px}
+    .info-grid{display:grid;grid-template-columns:1fr;gap:3px}
+    .label{font-weight:800;color:#1f2d43}
+    .muted{color:#697386}
+    .empty{padding:30px;text-align:center;color:#2e394a;font-weight:700}
+    @media(max-width:700px){
+      body{padding:8px}
+      .shell{padding:14px;border-radius:22px}
+      h1{font-size:30px}
     }
   </style>
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">Synagogue Message Board — Master Admin</div>
-    <div class="top-actions">
-      <button id="refreshBtn" class="btn-blue" type="button">Refresh</button>
-      <button id="mainLoginBtn" class="btn-gray" type="button">Synagogue Login</button>
-      <button id="logoutBtn" class="btn-red" type="button">Sign Out</button>
+  <main class="shell">
+    <h1>Master Admin</h1>
+    <div class="subtitle">Synagogue accounts, rabbi information, billing and account controls</div>
+
+    <div class="toolbar">
+      <button class="gold" id="refreshBtn">Refresh</button>
+      <a class="btn blue" href="register.html">Register Synagogue</a>
+      <button class="white" id="logoutBtn">Logout</button>
     </div>
-  </header>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1>Master Admin Dashboard</h1>
-      <div class="muted">
-        Manage synagogue registrations and view the information stored in the synagogue database.
-      </div>
+    <div id="statusBox" class="status">Checking master admin session…</div>
 
-      <div class="stats">
-        <div class="stat"><b id="totalCount">0</b>Total Synagogues</div>
-        <div class="stat"><b id="approvedCount">0</b>Approved</div>
-        <div class="stat"><b id="pendingCount">0</b>Pending</div>
-        <div class="stat"><b id="suspendedCount">0</b>Suspended</div>
-      </div>
-    </section>
-
-    <div id="message" class="message"></div>
-
-    <section class="toolbar">
-      <input id="searchInput" type="search" placeholder="Search synagogue, rabbi, owner, email, phone, address or ID">
-      <select id="statusFilter">
-        <option value="">All statuses</option>
-        <option value="approved">Approved</option>
-        <option value="pending">Pending</option>
-        <option value="suspended">Suspended</option>
-      </select>
-      <button id="clearBtn" class="btn-gold" type="button">Clear Search</button>
-    </section>
-
-    <section class="panel">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Synagogue</th>
-              <th>Rabbi / Owner</th>
-              <th>Contact</th>
-              <th>Address</th>
-              <th>Status</th>
-              <th>Registered</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-
-        <div id="emptyState" class="empty" style="display:none">
-          No synagogue registrations found.
-        </div>
-      </div>
-    </section>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th># / ID</th>
+            <th>Synagogue</th>
+            <th>Rabbi / Owner</th>
+            <th>Address</th>
+            <th>Telephone</th>
+            <th>Email / Login</th>
+            <th>Status</th>
+            <th>Trial</th>
+            <th>Price / month</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="10" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
   </main>
 
-  <div id="detailsModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <h2>Synagogue Details</h2>
-      <div id="detailsGrid" class="detail-grid"></div>
-      <button id="closeModalBtn" class="btn-gold" type="button" style="width:100%;margin-top:18px">
-        Close
-      </button>
-    </div>
-  </div>
+<script>
+(() => {
+  "use strict";
 
-  <!-- Supabase library MUST load first -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  const sb = window.getSupabase ? window.getSupabase() : null;
+  const rowsEl = document.getElementById("rows");
+  const statusBox = document.getElementById("statusBox");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  <!-- Shared Supabase configuration MUST load second -->
-  <script src="supabase-config.js"></script>
+  if (!sb) {
+    setStatus("Supabase client could not be created. Check supabase-config.js.", true);
+    return;
+  }
 
-  <script>
-    (function () {
-      "use strict";
+  function esc(v){
+    return String(v ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
-      const MASTER_ADMIN_EMAIL = "mano3491@gmail.com";
+  function setStatus(msg, isError=false, isSuccess=false){
+    statusBox.textContent = msg;
+    statusBox.className = "status" + (isError ? " error" : isSuccess ? " success" : "");
+  }
 
-      const tableBody = document.getElementById("tableBody");
-      const emptyState = document.getElementById("emptyState");
-      const messageBox = document.getElementById("message");
-      const searchInput = document.getElementById("searchInput");
-      const statusFilter = document.getElementById("statusFilter");
-      const refreshBtn = document.getElementById("refreshBtn");
-      const clearBtn = document.getElementById("clearBtn");
-      const logoutBtn = document.getElementById("logoutBtn");
-      const mainLoginBtn = document.getElementById("mainLoginBtn");
-      const detailsModal = document.getElementById("detailsModal");
-      const detailsGrid = document.getElementById("detailsGrid");
-      const closeModalBtn = document.getElementById("closeModalBtn");
+  function first(obj, keys, fallback=""){
+    for (const k of keys){
+      if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== ""){
+        return obj[k];
+      }
+    }
+    return fallback;
+  }
 
-      let rows = [];
+  function hasAny(obj, keys){
+    return keys.find(k => Object.prototype.hasOwnProperty.call(obj, k)) || null;
+  }
 
-      function showMessage(text, type) {
-        messageBox.textContent = text;
-        messageBox.className = "message " + (type || "info");
+  function fmtDate(v){
+    if (!v) return "—";
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return esc(v);
+    return d.toLocaleDateString();
+  }
+
+  function statusClass(status){
+    const s = String(status || "").toLowerCase();
+    if (s.includes("suspend")) return "suspended";
+    if (s.includes("pend")) return "pending";
+    if (s.includes("active") || s.includes("approve")) return "active";
+    return "";
+  }
+
+  async function requireMaster(){
+    const { data: { session }, error } = await sb.auth.getSession();
+    if (error) throw error;
+
+    if (!session) {
+      location.href = "login.html";
+      return null;
+    }
+
+    // If your database has a master_admins table, this verifies it.
+    // If not, the page still loads for an authenticated user and relies on RLS.
+    try {
+      const { data, error: masterErr } = await sb
+        .from("master_admins")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (!masterErr && !data) {
+        setStatus("This account is not listed as a master admin.", true);
+        return null;
+      }
+    } catch (_) {}
+
+    return session;
+  }
+
+  async function loadSynagogues(){
+    setStatus("Loading synagogue accounts…");
+    rowsEl.innerHTML = '<tr><td colspan="10" class="empty">Loading…</td></tr>';
+
+    try {
+      const session = await requireMaster();
+      if (!session) return;
+
+      const { data, error } = await sb
+        .from("synagogues")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      const list = data || [];
+      setStatus(`Master admin login successful — ${list.length} synagogue account(s).`, false, true);
+
+      if (!list.length){
+        rowsEl.innerHTML = '<tr><td colspan="10" class="empty">No synagogue accounts found.</td></tr>';
+        return;
       }
 
-      function clearMessage() {
-        messageBox.textContent = "";
-        messageBox.className = "message";
+      rowsEl.innerHTML = list.map(renderRow).join("");
+      attachActions(list);
+    } catch (err) {
+      console.error(err);
+      setStatus("Error: " + (err.message || err), true);
+      rowsEl.innerHTML = `<tr><td colspan="10" class="empty">Unable to load synagogue accounts.<br>${esc(err.message || err)}</td></tr>`;
+    }
+  }
+
+  function renderRow(s){
+    const number = first(s, ["synagogue_number","member_number","account_number"], "");
+    const id = first(s, ["id"], "");
+
+    const synagogueName = first(s, ["synagogue_name","name","organization_name"], "Unnamed Synagogue");
+    const rabbiName = first(s, ["rabbi_full_name","rabbi_name","owner_name","full_name","contact_name"], "—");
+    const address = first(s, ["address","street_address","synagogue_address"], "—");
+    const city = first(s, ["city"], "");
+    const state = first(s, ["state","province"], "");
+    const zip = first(s, ["zip","zip_code","postal_code"], "");
+    const phone = first(s, ["telephone","phone","phone_number","mobile"], "—");
+    const email = first(s, ["email","owner_email","admin_email","login_email"], "—");
+    const status = first(s, ["status","account_status"], "active");
+    const trialEnd = first(s, ["trial_end","trial_ends_at","trial_end_date"], "");
+    const price = first(s, ["monthly_price","price_per_month","price","subscription_price"], 0);
+
+    const address2 = [city,state,zip].filter(Boolean).join(", ");
+
+    return `
+      <tr data-id="${esc(id)}">
+        <td>
+          <div class="name">${number ? "#" + esc(number) : "—"}</div>
+          <div class="small">${esc(id)}</div>
+        </td>
+
+        <td>
+          <div class="name">${esc(synagogueName)}</div>
+          <div class="small">Created: ${fmtDate(first(s,["created_at"],""))}</div>
+        </td>
+
+        <td>
+          <div class="info-grid">
+            <span class="label">${esc(rabbiName)}</span>
+          </div>
+        </td>
+
+        <td>
+          <div>${esc(address)}</div>
+          ${address2 ? `<div class="small">${esc(address2)}</div>` : ""}
+        </td>
+
+        <td>${esc(phone)}</td>
+
+        <td>
+          <div>${esc(email)}</div>
+          <div class="small">Login email</div>
+        </td>
+
+        <td>
+          <span class="pill ${statusClass(status)}">${esc(status)}</span>
+        </td>
+
+        <td>${trialEnd ? fmtDate(trialEnd) : "—"}</td>
+
+        <td>
+          <input class="priceInput" type="number" min="0" step="0.01" value="${esc(price)}">
+        </td>
+
+        <td>
+          <div class="actions">
+            <button class="green approveBtn">Approve + 7 Days</button>
+            <button class="gold activateBtn">Activate</button>
+            <button class="red suspendBtn">Suspend</button>
+            <button class="blue savePriceBtn">Save Price</button>
+            ${email !== "—" ? '<button class="gray resetBtn">Send Password Reset</button>' : ""}
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function attachActions(list){
+    document.querySelectorAll("tbody tr[data-id]").forEach(tr => {
+      const id = tr.dataset.id;
+      const row = list.find(x => String(x.id) === String(id));
+      if (!row) return;
+
+      tr.querySelector(".approveBtn")?.addEventListener("click", () => approve7(row));
+      tr.querySelector(".activateBtn")?.addEventListener("click", () => setAccountStatus(row, "active"));
+      tr.querySelector(".suspendBtn")?.addEventListener("click", () => setAccountStatus(row, "suspended"));
+      tr.querySelector(".savePriceBtn")?.addEventListener("click", () => savePrice(row, tr));
+      tr.querySelector(".resetBtn")?.addEventListener("click", () => sendPasswordReset(row));
+    });
+  }
+
+  async function updateRow(id, payload){
+    const { error } = await sb.from("synagogues").update(payload).eq("id", id);
+    if (error) throw error;
+  }
+
+  async function approve7(row){
+    try{
+      const payload = {};
+
+      const statusCol = hasAny(row, ["status","account_status"]);
+      if (statusCol) payload[statusCol] = "active";
+
+      const trialCol = hasAny(row, ["trial_end","trial_ends_at","trial_end_date"]);
+      if (trialCol){
+        const d = new Date();
+        d.setDate(d.getDate() + 7);
+        payload[trialCol] = d.toISOString();
       }
 
-      function getClient() {
-        if (typeof window.getSupabase !== "function") {
-          throw new Error(
-            "supabase-config.js did not load. Make sure it is in the same GitHub folder as master-admin.html."
-          );
-        }
-        return window.getSupabase();
+      if (!Object.keys(payload).length){
+        throw new Error("No status or trial column was found in the synagogues table.");
       }
 
-      function lower(value) {
-        return String(value || "").trim().toLowerCase();
-      }
-
-      function valueFrom(row, names, fallback) {
-        for (const name of names) {
-          if (
-            Object.prototype.hasOwnProperty.call(row, name) &&
-            row[name] !== null &&
-            row[name] !== undefined &&
-            String(row[name]).trim() !== ""
-          ) {
-            return row[name];
-          }
-        }
-        return fallback || "";
-      }
-
-      function getStatus(row) {
-        return lower(
-          valueFrom(
-            row,
-            ["status", "approval_status", "account_status", "state"],
-            "pending"
-          )
-        );
-      }
-
-      function getNumber(row, index) {
-        return valueFrom(
-          row,
-          ["synagogue_number", "member_number", "public_id", "number"],
-          index + 1
-        );
-      }
-
-      function getSynagogueName(row) {
-        return valueFrom(
-          row,
-          ["synagogue_name", "name", "organization_name", "display_name"],
-          "Unnamed Synagogue"
-        );
-      }
-
-      function getRabbiName(row) {
-        return valueFrom(
-          row,
-          ["rabbi_name", "leader_name", "rabbi", "rabbi_full_name"],
-          ""
-        );
-      }
-
-      function getOwnerName(row) {
-        return valueFrom(
-          row,
-          ["full_name", "owner_name", "contact_name", "admin_name"],
-          ""
-        );
-      }
-
-      function getEmail(row) {
-        return valueFrom(
-          row,
-          ["email", "owner_email", "admin_email", "login_email"],
-          ""
-        );
-      }
-
-      function getPhone(row) {
-        return valueFrom(
-          row,
-          ["phone", "telephone", "phone_number", "owner_phone"],
-          ""
-        );
-      }
-
-      function getAddress(row) {
-        const direct = valueFrom(
-          row,
-          ["address", "full_address"],
-          ""
-        );
-        if (direct) return direct;
-
-        return [
-          valueFrom(row, ["street_address", "address_line1", "address1"], ""),
-          valueFrom(row, ["city"], ""),
-          valueFrom(row, ["state_region", "state", "province"], ""),
-          valueFrom(row, ["postal_code", "zip", "zipcode"], ""),
-          valueFrom(row, ["country"], "")
-        ].filter(Boolean).join(", ");
-      }
-
-      function getCreatedAt(row) {
-        return valueFrom(row, ["created_at", "registered_at", "created"], "");
-      }
-
-      function escapeHtml(value) {
-        return String(value === null || value === undefined ? "" : value)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
-      }
-
-      function formatDate(value) {
-        if (!value) return "";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return String(value);
-        return date.toLocaleString();
-      }
-
-      function badgeClass(status) {
-        if (status === "approved" || status === "active") return "approved";
-        if (status === "pending") return "pending";
-        if (status === "suspended" || status === "blocked" || status === "inactive") return "suspended";
-        return "unknown";
-      }
-
-      function normalizeStatus(status) {
-        if (status === "active") return "approved";
-        if (status === "blocked" || status === "inactive") return "suspended";
-        return status || "pending";
-      }
-
-      function updateStats() {
-        let approved = 0;
-        let pending = 0;
-        let suspended = 0;
-
-        rows.forEach(function (row) {
-          const s = normalizeStatus(getStatus(row));
-          if (s === "approved") approved++;
-          else if (s === "suspended") suspended++;
-          else if (s === "pending") pending++;
-        });
-
-        document.getElementById("totalCount").textContent = rows.length;
-        document.getElementById("approvedCount").textContent = approved;
-        document.getElementById("pendingCount").textContent = pending;
-        document.getElementById("suspendedCount").textContent = suspended;
-      }
-
-      function render() {
-        const query = lower(searchInput.value);
-        const filter = lower(statusFilter.value);
-
-        const filtered = rows.filter(function (row, index) {
-          const status = normalizeStatus(getStatus(row));
-
-          if (filter && status !== filter) return false;
-
-          if (!query) return true;
-
-          const haystack = [
-            getNumber(row, index),
-            row.id,
-            getSynagogueName(row),
-            getRabbiName(row),
-            getOwnerName(row),
-            getEmail(row),
-            getPhone(row),
-            getAddress(row),
-            status
-          ].join(" ").toLowerCase();
-
-          return haystack.includes(query);
-        });
-
-        tableBody.innerHTML = "";
-        emptyState.style.display = filtered.length ? "none" : "block";
-
-        filtered.forEach(function (row) {
-          const originalIndex = rows.indexOf(row);
-          const status = normalizeStatus(getStatus(row));
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>
-              <div class="name">${escapeHtml(getNumber(row, originalIndex))}</div>
-              <div class="small">${escapeHtml(row.id || "")}</div>
-            </td>
-            <td>
-              <div class="name">${escapeHtml(getSynagogueName(row))}</div>
-            </td>
-            <td>
-              <div><strong>Rabbi:</strong> ${escapeHtml(getRabbiName(row) || "—")}</div>
-              <div><strong>Owner:</strong> ${escapeHtml(getOwnerName(row) || "—")}</div>
-            </td>
-            <td>
-              <div>${escapeHtml(getEmail(row) || "—")}</div>
-              <div>${escapeHtml(getPhone(row) || "—")}</div>
-            </td>
-            <td>${escapeHtml(getAddress(row) || "—")}</td>
-            <td>
-              <span class="badge ${badgeClass(status)}">${escapeHtml(status || "unknown")}</span>
-            </td>
-            <td>${escapeHtml(formatDate(getCreatedAt(row)) || "—")}</td>
-            <td>
-              <div class="actions">
-                <button class="btn-blue" data-action="details" data-index="${originalIndex}" type="button">Details</button>
-                <button class="btn-green" data-action="approved" data-index="${originalIndex}" type="button">Approve</button>
-                <button class="btn-red" data-action="suspended" data-index="${originalIndex}" type="button">Suspend</button>
-              </div>
-            </td>
-          `;
-          tableBody.appendChild(tr);
-        });
-      }
-
-      async function requireMasterAdmin() {
-        const sb = getClient();
-
-        const {
-          data: { session },
-          error
-        } = await sb.auth.getSession();
-
-        if (error) throw error;
-
-        if (!session || !session.user) {
-          window.location.replace("master-login.html");
-          return null;
-        }
-
-        const user = session.user;
-        const email = lower(user.email);
-        const role = lower(
-          (user.user_metadata && user.user_metadata.role) ||
-          (user.app_metadata && user.app_metadata.role) ||
-          ""
-        );
-
-        const allowed =
-          email === MASTER_ADMIN_EMAIL.toLowerCase() ||
-          role === "master_admin" ||
-          role === "master-admin" ||
-          role === "master";
-
-        if (!allowed) {
-          await sb.auth.signOut();
-          window.location.replace("master-login.html");
-          return null;
-        }
-
-        return user;
-      }
-
-      async function loadSynagogues() {
-        clearMessage();
-        refreshBtn.disabled = true;
-        refreshBtn.textContent = "Loading...";
-
-        try {
-          const sb = getClient();
-
-          const { data, error } = await sb
-            .from("synagogues")
-            .select("*");
-
-          if (error) throw error;
-
-          rows = Array.isArray(data) ? data : [];
-
-          rows.sort(function (a, b) {
-            const na = Number(valueFrom(a, ["synagogue_number"], Number.MAX_SAFE_INTEGER));
-            const nb = Number(valueFrom(b, ["synagogue_number"], Number.MAX_SAFE_INTEGER));
-
-            if (na !== nb) return na - nb;
-
-            const da = new Date(getCreatedAt(a) || 0).getTime();
-            const db = new Date(getCreatedAt(b) || 0).getTime();
-
-            return da - db;
-          });
-
-          updateStats();
-          render();
-
-          showMessage(
-            "Loaded " + rows.length + " synagogue registration" + (rows.length === 1 ? "." : "s."),
-            "ok"
-          );
-
-        } catch (error) {
-          console.error("Load error:", error);
-          showMessage(
-            (error && error.message ? error.message : "Unable to load synagogues.") +
-            " Check that the synagogues table exists and that its RLS policy allows the Master Admin to read it.",
-            "error"
-          );
-        } finally {
-          refreshBtn.disabled = false;
-          refreshBtn.textContent = "Refresh";
-        }
-      }
-
-      async function updateStatus(row, newStatus) {
-        if (!row || !row.id) {
-          showMessage("This synagogue record has no ID.", "error");
-          return;
-        }
-
-        const sb = getClient();
-
-        const possibleColumns = ["status", "approval_status", "account_status"];
-        let lastError = null;
-
-        for (const column of possibleColumns) {
-          const payload = {};
-          payload[column] = newStatus;
-
-          const { error } = await sb
-            .from("synagogues")
-            .update(payload)
-            .eq("id", row.id);
-
-          if (!error) {
-            row[column] = newStatus;
-            showMessage(
-              getSynagogueName(row) + " changed to " + newStatus + ".",
-              "ok"
-            );
-            updateStats();
-            render();
-            return;
-          }
-
-          lastError = error;
-
-          const text = lower(error.message);
-          if (
-            !text.includes("column") &&
-            !text.includes("does not exist") &&
-            !text.includes("schema cache")
-          ) {
-            break;
-          }
-        }
-
-        throw lastError || new Error("Could not update synagogue status.");
-      }
-
-      function showDetails(row) {
-        const fields = [
-          ["Synagogue Number", valueFrom(row, ["synagogue_number", "member_number", "public_id", "number"], "")],
-          ["Database ID", row.id || ""],
-          ["Synagogue Name", getSynagogueName(row)],
-          ["Rabbi Full Name", getRabbiName(row)],
-          ["Owner / Admin Full Name", getOwnerName(row)],
-          ["Telephone", getPhone(row)],
-          ["Email / Login Email", getEmail(row)],
-          ["Address", getAddress(row)],
-          ["Status", normalizeStatus(getStatus(row))],
-          ["Referred By", valueFrom(row, ["referred_by", "referrer"], "")],
-          ["Created", formatDate(getCreatedAt(row))]
-        ];
-
-        detailsGrid.innerHTML = fields.map(function (item) {
-          return `
-            <div class="detail">
-              <span>${escapeHtml(item[0])}</span>
-              <strong>${escapeHtml(item[1] || "—")}</strong>
-            </div>
-          `;
-        }).join("");
-
-        detailsModal.classList.add("open");
-        detailsModal.setAttribute("aria-hidden", "false");
-      }
-
-      tableBody.addEventListener("click", async function (event) {
-        const button = event.target.closest("button[data-action]");
-        if (!button) return;
-
-        const index = Number(button.dataset.index);
-        const row = rows[index];
-        const action = button.dataset.action;
-
-        if (!row) return;
-
-        if (action === "details") {
-          showDetails(row);
-          return;
-        }
-
-        if (action === "approved" || action === "suspended") {
-          button.disabled = true;
-          try {
-            await updateStatus(row, action);
-          } catch (error) {
-            console.error("Status update error:", error);
-            showMessage(
-              error && error.message
-                ? error.message
-                : "Unable to update synagogue status.",
-              "error"
-            );
-          } finally {
-            button.disabled = false;
-          }
-        }
-      });
-
-      searchInput.addEventListener("input", render);
-      statusFilter.addEventListener("change", render);
-
-      clearBtn.addEventListener("click", function () {
-        searchInput.value = "";
-        statusFilter.value = "";
-        render();
-      });
-
-      refreshBtn.addEventListener("click", loadSynagogues);
-
-      logoutBtn.addEventListener("click", async function () {
-        try {
-          const sb = getClient();
-          await sb.auth.signOut();
-        } finally {
-          window.location.href = "master-login.html";
-        }
-      });
-
-      mainLoginBtn.addEventListener("click", function () {
-        window.location.href = "login.html";
-      });
-
-      closeModalBtn.addEventListener("click", function () {
-        detailsModal.classList.remove("open");
-        detailsModal.setAttribute("aria-hidden", "true");
-      });
-
-      detailsModal.addEventListener("click", function (event) {
-        if (event.target === detailsModal) {
-          detailsModal.classList.remove("open");
-          detailsModal.setAttribute("aria-hidden", "true");
-        }
-      });
-
-      window.addEventListener("load", async function () {
-        try {
-          const user = await requireMasterAdmin();
-          if (!user) return;
-          await loadSynagogues();
-        } catch (error) {
-          console.error("Master Admin startup error:", error);
-          showMessage(
-            error && error.message
-              ? error.message
-              : "Unable to open the Master Admin dashboard.",
-            "error"
-          );
-        }
-      });
-    })();
-  </script>
+      await updateRow(row.id, payload);
+      setStatus("Synagogue approved and 7-day trial applied.", false, true);
+      await loadSynagogues();
+    }catch(err){
+      setStatus("Approve failed: " + (err.message || err), true);
+    }
+  }
+
+  async function setAccountStatus(row, newStatus){
+    try{
+      const statusCol = hasAny(row, ["status","account_status"]);
+      if (!statusCol) throw new Error("No status column was found in the synagogues table.");
+
+      await updateRow(row.id, { [statusCol]: newStatus });
+      setStatus(`Account changed to ${newStatus}.`, false, true);
+      await loadSynagogues();
+    }catch(err){
+      setStatus("Status update failed: " + (err.message || err), true);
+    }
+  }
+
+  async function savePrice(row, tr){
+    try{
+      const input = tr.querySelector(".priceInput");
+      const price = Number(input.value || 0);
+
+      const priceCol = hasAny(row, ["monthly_price","price_per_month","price","subscription_price"]);
+      if (!priceCol) throw new Error("No monthly price column was found in the synagogues table.");
+
+      await updateRow(row.id, { [priceCol]: price });
+      setStatus("Monthly price saved.", false, true);
+      await loadSynagogues();
+    }catch(err){
+      setStatus("Price update failed: " + (err.message || err), true);
+    }
+  }
+
+  async function sendPasswordReset(row){
+    try{
+      const email = first(row, ["email","owner_email","admin_email","login_email"], "");
+      if (!email) throw new Error("No email address is stored for this synagogue.");
+
+      const redirectTo = new URL("login.html", window.location.href).href;
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+
+      setStatus(`Password reset email sent to ${email}.`, false, true);
+    }catch(err){
+      setStatus("Password reset failed: " + (err.message || err), true);
+    }
+  }
+
+  refreshBtn.addEventListener("click", loadSynagogues);
+
+  logoutBtn.addEventListener("click", async () => {
+    await sb.auth.signOut();
+    location.href = "login.html";
+  });
+
+  loadSynagogues();
+})();
+</script>
 </body>
 </html>
